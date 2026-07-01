@@ -138,9 +138,9 @@
   .center h1{max-width:16ch;}
   .center .sub{margin-top:20px;max-width:48ch;}
   .progress{margin-top:34px;width:min(280px,70vw);height:4px;border-radius:999px;background:var(--line);overflow:hidden;position:relative;}
-  .progress span{position:absolute;inset:0;width:42%;border-radius:999px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:sweep 2.2s cubic-bezier(.5,0,.5,1) infinite;}
+  .progress span{position:absolute;top:0;bottom:0;left:0;width:40%;border-radius:999px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:sweep 1.5s ease-in-out infinite;}
   html.ar .progress span{animation-direction:reverse;}
-  @keyframes sweep{0%{transform:translateX(-110%)}100%{transform:translateX(360%)}}
+  @keyframes sweep{0%{transform:translateX(-125%)}100%{transform:translateX(315%)}}
 
   /* big 404 glyph for the crash view */
   .glitch{font-family:var(--display);font-weight:700;font-size:clamp(70px,16vw,150px);line-height:1;letter-spacing:-.04em;margin:0;color:var(--ink);position:relative;}
@@ -177,16 +177,26 @@
   }
 
   /* ---- blurred "more coming" teaser ---- */
-  .portal.teaser{border-style:dashed;border-color:var(--line-strong);background:var(--surface-2);box-shadow:none;cursor:default;justify-content:flex-end;}
-  .portal.teaser:hover{--ty:0px;--sc:1;border-color:var(--line-strong);box-shadow:none;}
+  /* --- "more tools" ghost card: a quiet preview of a future tool; fully inert --- */
+  .portal.teaser{position:relative;border-style:dashed;border-color:var(--line-strong);
+    background:var(--surface-2);
+    background-image:radial-gradient(135% 80% at 50% -12%,rgba(215,33,32,.035),transparent 58%);
+    box-shadow:none;cursor:default;pointer-events:none;overflow:hidden;}
   .portal.teaser::before,.portal.teaser::after{display:none;}
-  .t-ghost{position:absolute;inset:0;padding:clamp(22px,2.6vw,30px);display:flex;flex-direction:column;gap:14px;filter:blur(3px);opacity:.45;z-index:0;}
-  .tg-ico{width:54px;height:54px;border-radius:14px;background:var(--line);}
-  .tg-bar{border-radius:7px;background:var(--line);}
-  .tg-bar.b1{width:58%;height:22px;margin-top:auto;}
-  .tg-bar.b2{width:38%;height:14px;}
-  .t-label{position:relative;z-index:2;display:inline-flex;align-items:center;gap:9px;align-self:flex-start;margin-top:auto;background:var(--surface);border:1px solid var(--line-strong);border-radius:999px;padding:9px 15px;font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted);box-shadow:0 1px 2px rgba(23,24,28,.05);}
-  .ts-ico{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:14px;line-height:1;}
+  .t-head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .tsk-ico{position:relative;width:clamp(46px,5vw,54px);height:clamp(46px,5vw,54px);border-radius:15px;background:var(--line);}
+  .tsk-ico::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;font:700 22px/1 var(--mono);color:var(--line-strong);}
+  .t-soon{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;
+    font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);border:1px solid var(--line-strong);background:var(--surface);}
+  html.ar .t-soon{font-family:"Cairo","Noto Kufi Arabic",sans-serif;letter-spacing:0;text-transform:none;}
+  .t-soon .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong);}
+  .tsk-line{border-radius:7px;height:12px;background:var(--line);}
+  .tsk-line.l1{width:64%;margin-top:28px;}
+  .tsk-line.l2{width:42%;margin-top:11px;}
+  .t-cap{margin-top:auto;font-family:var(--mono);font-size:12.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);opacity:.9;}
+  html.ar .t-cap{font-family:"Cairo","Noto Kufi Arabic",sans-serif;letter-spacing:0;font-weight:700;font-size:13.5px;}
+
 
   /* ============ ARABIC TYPOGRAPHY (Cairo) ============ */
   html.ar body,html.ar h1,html.ar .p-title,html.ar .wordmark,html.ar .mark,
@@ -253,8 +263,13 @@
           </div>
         </a>
         <div class="portal teaser rise d5" aria-hidden="true">
-          <div class="t-ghost"><span class="tg-ico"></span><span class="tg-bar b1"></span><span class="tg-bar b2"></span></div>
-          <span class="t-label"><span class="ts-ico">+</span><span data-en="More tools on the way" data-ar="أدوات أخرى في الطريق">More tools on the way</span></span>
+          <div class="t-head">
+            <span class="tsk-ico"></span>
+            <span class="t-soon"><span class="dot"></span><span data-en="Soon" data-ar="قريبًا">Soon</span></span>
+          </div>
+          <span class="tsk-line l1"></span>
+          <span class="tsk-line l2"></span>
+          <span class="t-cap" data-en="More tools on the way" data-ar="أدوات أخرى قريبًا">More tools on the way</span>
         </div>
       </main>
     </section>
@@ -310,7 +325,7 @@
   /* brief card: open the tool in a new tab; if not configured, show the crash view */
   (function(){
     var card=document.getElementById("brief-card");
-    if(BRIEF_URL){ card.setAttribute("href",BRIEF_URL); card.setAttribute("target","_blank"); card.setAttribute("rel","noopener"); }
+    if(BRIEF_URL){ card.setAttribute("href",BRIEF_URL); }
     else { card.setAttribute("href","#error"); }
   })();
 
