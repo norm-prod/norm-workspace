@@ -1483,7 +1483,7 @@ function payload(){
   const today=new Date(); const date=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
   const printItems=[], choices={}, printList=[];
   itemEls.forEach(r=>{ if(selected.has(r.id)&&r.pr&&!DIGITAL.has(r.en)){ printItems.push(r.en); choices[r.en]=fmtText(r.id); const arch=dieArch(r.en); const dieUrl=arch==="carton"?"https://www.templatemaker.nl/en/mailer/":arch==="bag"?"https://www.templatemaker.nl/en/bag/":arch==="cup"?"https://www.templatemaker.nl/en/cup/":"https://www.templatemaker.nl/"; printList.push({n:r[LANG], f:fmtText(r.id), key:r.en, s:specDeck(r), sz:dimsLabel(r), die:dieUrl}); } });
-  return {LANG:LANG,SESSION:(window.NORM_SESSION||""),SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),printItems,choices,printList};
+  return {LANG:LANG,SESSION:(window.NORM_SESSION||""),SUBMITTER_ROLE:(window.NORM_ROLE||""),SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),printItems,choices,printList};
 }
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbzuMHIjT48xGeX1FchIA1YiIZiuIZgYgZCNrDYTgintWRUsqNZNtUKgkDTtKuYNVVho/exec";
 function loadingHTML(){
@@ -1753,69 +1753,112 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   setTimeout(restore,60);
 })();
 
-/* ===== sign-in gate: passwordless emailed code ===== */
+/* ===== sign-in gate: NORM Workspace (passwordless code + profile) ===== */
 (function(){
-  var TK="norm_session_v1", EM="norm_email_v1";
+  var TK="norm_session_v1", EM="norm_email_v1", NM="norm_name_v1", RL="norm_role_v1";
   var tok=""; try{ tok=localStorage.getItem(TK)||""; }catch(e){}
   window.NORM_SESSION=tok;
-  var savedEmail=""; try{ savedEmail=localStorage.getItem(EM)||""; }catch(e){}
+  var savedEmail="",savedName="",savedRole=""; try{ savedEmail=localStorage.getItem(EM)||""; savedName=localStorage.getItem(NM)||""; savedRole=localStorage.getItem(RL)||""; }catch(e){}
+  window.NORM_NAME=savedName; window.NORM_ROLE=savedRole;
   function AR(){ return (typeof LANG!=="undefined") ? LANG==="ar" : (document.documentElement.lang==="ar"); }
+  function lang(){ return (typeof LANG!=="undefined")?LANG:"en"; }
   var T={
-    title:["Sign in to Norm","الدخول إلى Norm"],
-    sub:["Enter your work email — we'll send a one-time code.","أدخل بريدك المهني — سنرسل إليك رمزًا لمرة واحدة."],
+    ws:["Workspace","مساحة العمل"],
+    title:["Sign in","تسجيل الدخول"],
+    sub:["Enter your work email and we'll send a one-time code.","أدخل بريدك المهني وسنرسل إليك رمزًا لمرة واحدة."],
+    lemail:["Work email","البريد المهني"], lcode:["Verification code","رمز التحقّق"],
+    lname:["Your name","الاسم"], lrole:["Your role","الصفة"],
     send:["Send code","إرسال الرمز"], verify:["Verify & continue","تحقّق وتابع"],
-    codesub:["Enter the 6-digit code we emailed to","أدخل الرمز المكوّن من 6 أرقام المُرسل إلى"],
-    resend:["Resend code","إعادة إرسال الرمز"], change:["Use a different email","استخدام بريد آخر"],
-    sending:["Sending…","جارٍ الإرسال…"], checking:["Checking…","جارٍ التحقّق…"],
-    e_email:["Enter a valid email.","أدخل بريدًا صحيحًا."], e_send:["Couldn't send the code. Try again.","تعذّر إرسال الرمز. حاول مجددًا."],
+    codesub:["We emailed a 6-digit code to","أرسلنا رمزًا من 6 أرقام إلى"],
+    resend:["Resend code","إعادة إرسال الرمز"], change:["Use a different email","بريد آخر"],
+    sending:["Sending…","جارٍ الإرسال…"], checking:["Verifying…","جارٍ التحقّق…"],
+    e_email:["Enter a valid email.","أدخل بريدًا صحيحًا."], e_name:["Enter your name.","أدخل اسمك."],
+    e_send:["Couldn't send the code. Try again.","تعذّر إرسال الرمز. حاول مجددًا."],
     e_wrong:["Incorrect code.","رمز غير صحيح."], e_expired:["Code expired — request a new one.","انتهت صلاحية الرمز — اطلب رمزًا جديدًا."],
     e_locked:["Too many attempts — request a new code.","محاولات كثيرة — اطلب رمزًا جديدًا."], e_net:["Connection problem. Try again.","مشكلة اتصال. حاول مجددًا."],
-    signedin:["Signed in","مُسجّل الدخول"], signout:["Sign out","تسجيل الخروج"]
+    signout:["Sign out","خروج"]
   };
+  var ROLES=[["Account Manager","مدير حساب"],["Agency Partner","شريك وكالة"],["Creative Director","مدير إبداعي"],["Client","عميل"],["Other","أخرى"]];
   function tx(k){ return T[k][AR()?1:0]; }
+  function logoSrc(){ try{ var im=document.querySelector(".brandlogo"); if(im&&im.src) return im.src; }catch(e){} return ""; }
+
   var css=document.createElement("style");
   css.textContent=
-  "#norm-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(120% 90% at 50% 0%,rgba(215,33,32,.06),transparent 55%),#ECECE8;font-family:var(--display),system-ui,sans-serif;}"+
-  "#norm-gate .ng-card{width:100%;max-width:380px;background:#FCFCFA;border:1px solid #DEDDD6;border-radius:18px;padding:28px 26px;box-shadow:0 30px 80px -30px rgba(23,24,28,.35);}"+
-  "#norm-gate .ng-logo{font-weight:800;font-size:20px;letter-spacing:.06em;color:#17181C;margin-bottom:16px;}"+
-  "#norm-gate h2{margin:0 0 6px;font-size:19px;color:#17181C;font-weight:700;}"+
-  "#norm-gate p{margin:0 0 16px;font-size:13.5px;color:#74756F;line-height:1.6;}"+
-  "#norm-gate input{width:100%;box-sizing:border-box;padding:12px 14px;font-size:15px;border:1px solid #CFCEC5;border-radius:11px;background:#fff;color:#17181C;outline:none;font-family:inherit;}"+
-  "#norm-gate input:focus{border-color:#d72120;}"+
-  "#norm-gate .ng-btn{width:100%;margin-top:12px;padding:12px 14px;font-size:14.5px;font-weight:700;color:#fff;background:#d72120;border:0;border-radius:11px;cursor:pointer;font-family:inherit;}"+
-  "#norm-gate .ng-btn:hover{background:#c01d1c;}#norm-gate .ng-btn:disabled{opacity:.6;cursor:default;}"+
-  "#norm-gate .ng-code{text-align:center;letter-spacing:.4em;font-size:20px;font-family:var(--mono),monospace;}"+
-  "#norm-gate .ng-links{margin-top:14px;font-size:12.5px;display:flex;gap:12px;flex-wrap:wrap;}"+
-  "#norm-gate .ng-links a{color:#74756F;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}"+
-  "#norm-gate .ng-links a:hover{color:#d72120;}"+
-  "#norm-gate .ng-err{margin-top:12px;font-size:13px;color:#d72120;}"+
-  "#norm-signed{position:fixed;top:10px;z-index:9990;display:inline-flex;align-items:center;gap:9px;background:#FCFCFA;border:1px solid #DEDDD6;border-radius:999px;padding:6px 12px;font-size:12px;color:#74756F;box-shadow:0 2px 8px rgba(23,24,28,.06);font-family:var(--mono),monospace;}"+
-  "#norm-signed a{color:#d72120;cursor:pointer;text-decoration:none;font-weight:700;}"+
-  "html:not(.ar) #norm-signed{right:14px;}html.ar #norm-signed{left:14px;}";
+  "#norm-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(90% 60% at 50% -5%,rgba(215,33,32,.07),transparent 60%),radial-gradient(70% 50% at 100% 100%,rgba(224,169,59,.05),transparent 60%),#EDEDE9;font-family:var(--display),system-ui,sans-serif;}"+
+  "#norm-gate .ng-card{position:relative;width:100%;max-width:400px;background:#FCFCFA;border:1px solid #E4E3DC;border-radius:20px;padding:34px 32px 30px;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 40px 90px -32px rgba(23,24,28,.4);overflow:hidden;}"+
+  "#norm-gate .ng-accent{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d72120,#E5443F 55%,#E0A93B);}"+
+  "#norm-gate .ng-head{display:flex;align-items:center;gap:11px;margin-bottom:22px;}"+
+  "#norm-gate .ng-logo{height:22px;width:auto;display:block;}"+
+  "#norm-gate .ng-wsx{font-size:11.5px;font-weight:700;letter-spacing:.14em;color:#A6A69E;font-family:var(--mono),monospace;text-transform:uppercase;padding-inline-start:11px;border-inline-start:1px solid #E4E3DC;}"+
+  "html.ar #norm-gate .ng-wsx{font-family:var(--display);text-transform:none;letter-spacing:0;font-weight:600;}"+
+  "#norm-gate h2{margin:0 0 6px;font-size:22px;color:#17181C;font-weight:700;letter-spacing:-.01em;}"+
+  "#norm-gate .ng-p{margin:0 0 22px;font-size:13.5px;color:#74756F;line-height:1.65;}"+
+  "#norm-gate .ng-lbl{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#9A9A93;margin:0 0 7px;font-family:var(--mono),monospace;}"+
+  "html.ar #norm-gate .ng-lbl{font-family:var(--display);letter-spacing:0;text-transform:none;font-size:12.5px;}"+
+  "#norm-gate input,#norm-gate .ng-sel{width:100%;box-sizing:border-box;padding:13px 15px;font-size:15px;border:1px solid #D6D5CC;border-radius:12px;background:#fff;color:#17181C;outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s;}"+
+  "#norm-gate input:focus,#norm-gate .ng-sel:focus{border-color:#d72120;box-shadow:0 0 0 3px rgba(215,33,32,.12);}"+
+  "#norm-gate input+.ng-lbl,#norm-gate .ng-sel+.ng-lbl{margin-top:16px;}"+
+  "#norm-gate .ng-code{text-align:center;letter-spacing:.5em;font-size:22px;font-weight:700;font-family:var(--mono),monospace;padding-inline-start:calc(15px + .5em);}"+
+  "#norm-gate .ng-btn{width:100%;margin-top:22px;padding:13px 15px;font-size:15px;font-weight:700;color:#fff;background:#d72120;border:0;border-radius:12px;cursor:pointer;font-family:inherit;transition:background .15s,transform .05s;}"+
+  "#norm-gate .ng-btn:hover{background:#c01d1c;}#norm-gate .ng-btn:active{transform:translateY(1px);}#norm-gate .ng-btn:disabled{opacity:.55;cursor:default;}"+
+  "#norm-gate .ng-links{margin-top:16px;font-size:12.5px;display:flex;gap:16px;flex-wrap:wrap;}"+
+  "#norm-gate .ng-links a{color:#74756F;cursor:pointer;text-decoration:none;border-bottom:1px solid #D6D5CC;padding-bottom:1px;}"+
+  "#norm-gate .ng-links a:hover{color:#d72120;border-color:#d72120;}"+
+  "#norm-gate .ng-err{margin-top:14px;font-size:13px;color:#d72120;font-family:var(--display);}"+
+  "#norm-gate .ng-lang{display:flex;justify-content:center;gap:6px;margin-top:24px;padding-top:18px;border-top:1px solid #EDECE6;}"+
+  "#norm-gate .ng-lang button{background:transparent;border:1px solid transparent;color:#9A9A93;font-family:var(--mono),monospace;font-size:12px;font-weight:700;padding:5px 13px;border-radius:999px;cursor:pointer;letter-spacing:.02em;transition:color .15s,background .15s;}"+
+  "#norm-gate .ng-lang button.on{background:#F1F0EC;color:#17181C;border-color:#E4E3DC;}"+
+  "#norm-gate .ng-lang button:hover{color:#17181C;}html.ar #norm-gate .ng-lang button{font-family:var(--display);}"+
+  "#norm-signed{position:fixed;top:11px;z-index:9990;display:inline-flex;align-items:center;gap:10px;background:#FCFCFA;border:1px solid #E4E3DC;border-radius:999px;padding:6px 8px;padding-inline-start:13px;font-size:12px;color:#54554F;box-shadow:0 4px 14px -6px rgba(23,24,28,.18);font-family:var(--display),system-ui,sans-serif;}"+
+  "#norm-signed .ng-dot{width:6px;height:6px;border-radius:50%;background:#12996A;flex:none;}"+
+  "#norm-signed a{background:#F1F0EC;color:#54554F;cursor:pointer;text-decoration:none;font-weight:600;border-radius:999px;padding:4px 11px;white-space:nowrap;}"+
+  "#norm-signed a:hover{color:#d72120;}"+
+  "html:not(.ar) #norm-signed{right:14px;}html.ar #norm-signed{left:14px;}"+
+  "#norm-intro{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:radial-gradient(90% 60% at 50% -5%,rgba(215,33,32,.07),transparent 60%),radial-gradient(70% 50% at 100% 100%,rgba(224,169,59,.05),transparent 60%),#EDEDE9;animation:niLift .72s cubic-bezier(.76,0,.24,1) 1.05s forwards;}"+
+  "#norm-intro .ni-in{opacity:0;transform:translateY(9px) scale(.985);animation:niIn .6s cubic-bezier(.2,.8,.25,1) .16s forwards;}"+
+  "#norm-intro .ni-logo{height:30px;width:auto;display:block;}"+
+  "#norm-intro .ni-word{font-weight:800;font-size:26px;letter-spacing:.08em;color:#17181C;}"+
+  "@keyframes niIn{to{opacity:1;transform:none}}@keyframes niLift{to{transform:translateY(-101%)}}";
   document.head.appendChild(css);
-  var gate,emailStep,codeStep,emailInp,codeInp,sendBtn,verifyBtn,errBox,subEl,curEmail="";
+
+  var gate,emailStep,codeStep,emailInp,codeInp,nameInp,roleSel,sendBtn,verifyBtn,errBox,subEl,curEmail="",curStep="email";
+  function g(id){ return gate.querySelector("#"+id); }
   function err(m){ errBox.textContent=m||""; errBox.style.display=m?"":"none"; }
-  function lang(){ return (typeof LANG!=="undefined")?LANG:"en"; }
+  function applyGateText(){
+    if(!gate) return;
+    gate.setAttribute("dir",AR()?"rtl":"ltr");
+    g("ng-ws").textContent=tx("ws"); g("ng-t").textContent=tx("title");
+    subEl.textContent=(curStep==="code"&&curEmail)?(tx("codesub")+" "+curEmail+"."):tx("sub");
+    g("ng-le").textContent=tx("lemail"); g("ng-lc").textContent=tx("lcode"); g("ng-ln").textContent=tx("lname"); g("ng-lr").textContent=tx("lrole");
+    if(!sendBtn.disabled) sendBtn.textContent=tx("send"); if(!verifyBtn.disabled) verifyBtn.textContent=tx("verify");
+    g("ng-re").textContent=tx("resend"); g("ng-ch").textContent=tx("change");
+    Array.prototype.forEach.call(roleSel.options,function(o,i){ if(ROLES[i]) o.textContent=ROLES[i][AR()?1:0]; });
+    Array.prototype.forEach.call(gate.querySelectorAll(".ng-lang button"),function(bn){ bn.classList.toggle("on", bn.getAttribute("data-l")===lang()); });
+  }
   function buildGate(){
     gate=document.createElement("div"); gate.id="norm-gate"; gate.setAttribute("dir",AR()?"rtl":"ltr");
-    gate.innerHTML='<div class="ng-card" role="dialog" aria-modal="true"><div class="ng-logo">NORM</div><h2 id="ng-t"></h2><p id="ng-s"></p>'+
-      '<div id="ng-es"><input id="ng-e" type="email" autocomplete="email" placeholder="you@agency.com"><button class="ng-btn" id="ng-send"></button></div>'+
-      '<div id="ng-cs" hidden><input id="ng-c" class="ng-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"><button class="ng-btn" id="ng-v"></button>'+
-      '<div class="ng-links"><a id="ng-re"></a><a id="ng-ch"></a></div></div><div class="ng-err" id="ng-err" style="display:none"></div></div>';
+    var lg=logoSrc();
+    var opts=ROLES.map(function(r){ return '<option value="'+r[0]+'"'+(savedRole===r[0]?" selected":"")+'>'+r[AR()?1:0]+'</option>'; }).join("");
+    gate.innerHTML='<div class="ng-card" role="dialog" aria-modal="true"><span class="ng-accent"></span>'+
+      '<div class="ng-head">'+(lg?('<img class="ng-logo" src="'+lg+'" alt="Norm">'):'<strong style="font-weight:800;letter-spacing:.06em;font-size:18px">NORM</strong>')+'<span class="ng-wsx" id="ng-ws"></span></div>'+
+      '<h2 id="ng-t"></h2><p class="ng-p" id="ng-s"></p>'+
+      '<div id="ng-es"><label class="ng-lbl" id="ng-le"></label><input id="ng-e" type="email" autocomplete="email" placeholder="you@agency.com"><button class="ng-btn" id="ng-send"></button></div>'+
+      '<div id="ng-cs" hidden><label class="ng-lbl" id="ng-lc"></label><input id="ng-c" class="ng-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••">'+
+        '<label class="ng-lbl" id="ng-ln"></label><input id="ng-n" type="text" autocomplete="name">'+
+        '<label class="ng-lbl" id="ng-lr"></label><select id="ng-r" class="ng-sel">'+opts+'</select>'+
+        '<button class="ng-btn" id="ng-v"></button><div class="ng-links"><a id="ng-re"></a><a id="ng-ch"></a></div></div>'+
+      '<div class="ng-err" id="ng-err" style="display:none"></div>'+
+      '<div class="ng-lang"><button type="button" data-l="en">EN</button><button type="button" data-l="ar">عربي</button></div></div>';
     document.body.appendChild(gate);
-    emailStep=gate.querySelector("#ng-es"); codeStep=gate.querySelector("#ng-cs");
-    emailInp=gate.querySelector("#ng-e"); codeInp=gate.querySelector("#ng-c");
-    sendBtn=gate.querySelector("#ng-send"); verifyBtn=gate.querySelector("#ng-v");
-    errBox=gate.querySelector("#ng-err"); subEl=gate.querySelector("#ng-s");
-    gate.querySelector("#ng-t").textContent=tx("title"); subEl.textContent=tx("sub");
-    sendBtn.textContent=tx("send"); verifyBtn.textContent=tx("verify");
-    gate.querySelector("#ng-re").textContent=tx("resend"); gate.querySelector("#ng-ch").textContent=tx("change");
-    if(savedEmail) emailInp.value=savedEmail;
+    emailStep=g("ng-es"); codeStep=g("ng-cs"); emailInp=g("ng-e"); codeInp=g("ng-c"); nameInp=g("ng-n"); roleSel=g("ng-r");
+    sendBtn=g("ng-send"); verifyBtn=g("ng-v"); errBox=g("ng-err"); subEl=g("ng-s");
+    if(savedEmail) emailInp.value=savedEmail; if(savedName) nameInp.value=savedName;
+    applyGateText();
     sendBtn.addEventListener("click",doSend); verifyBtn.addEventListener("click",doVerify);
     emailInp.addEventListener("keydown",function(e){ if(e.key==="Enter") doSend(); });
-    codeInp.addEventListener("keydown",function(e){ if(e.key==="Enter") doVerify(); });
-    gate.querySelector("#ng-re").addEventListener("click",function(){ if(curEmail) sendCode(curEmail); });
-    gate.querySelector("#ng-ch").addEventListener("click",function(){ err(""); codeStep.hidden=true; emailStep.hidden=false; subEl.textContent=tx("sub"); try{emailInp.focus();}catch(e){} });
+    g("ng-re").addEventListener("click",function(){ if(curEmail) sendCode(curEmail); });
+    g("ng-ch").addEventListener("click",function(){ err(""); curStep="email"; codeStep.hidden=true; emailStep.hidden=false; subEl.textContent=tx("sub"); try{emailInp.focus();}catch(e){} });
+    Array.prototype.forEach.call(gate.querySelectorAll(".ng-lang button"),function(bn){ bn.addEventListener("click",function(){ var l=bn.getAttribute("data-l"); if(typeof setLang==="function"){ try{ setLang(l); }catch(e){} } applyGateText(); }); });
     setTimeout(function(){ try{ emailInp.focus(); }catch(e){} },80);
   }
   function doSend(){ var em=(emailInp.value||"").trim(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ err(tx("e_email")); return; } sendCode(em); }
@@ -1823,29 +1866,48 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     err(""); sendBtn.disabled=true; sendBtn.textContent=tx("sending");
     aiFetch({auth:"request",email:em,lang:lang()}).then(function(r){
       sendBtn.disabled=false; sendBtn.textContent=tx("send");
-      if(r&&r.ok){ curEmail=em; try{localStorage.setItem(EM,em);}catch(e){} emailStep.hidden=true; codeStep.hidden=false; subEl.textContent=tx("codesub")+" "+em+"."; codeInp.value=""; try{codeInp.focus();}catch(e){} err(""); }
+      if(r&&r.ok){ curEmail=em; curStep="code"; try{localStorage.setItem(EM,em);}catch(e){} emailStep.hidden=true; codeStep.hidden=false; subEl.textContent=tx("codesub")+" "+em+"."; codeInp.value=""; try{codeInp.focus();}catch(e){} err(""); }
       else err(tx(r&&r.error==="invalid email"?"e_email":"e_send"));
     }).catch(function(){ sendBtn.disabled=false; sendBtn.textContent=tx("send"); err(tx("e_net")); });
   }
   function doVerify(){
-    var code=(codeInp.value||"").trim(); if(code.length<4){ err(tx("e_wrong")); return; }
+    var code=(codeInp.value||"").trim(), name=(nameInp.value||"").trim(), role=roleSel.value||"";
+    if(code.length<4){ err(tx("e_wrong")); return; }
+    if(!name){ err(tx("e_name")); try{nameInp.focus();}catch(e){} return; }
     err(""); verifyBtn.disabled=true; verifyBtn.textContent=tx("checking");
-    aiFetch({auth:"verify",email:curEmail,code:code,lang:lang()}).then(function(r){
+    aiFetch({auth:"verify",email:curEmail,code:code,name:name,role:role,lang:lang()}).then(function(r){
       verifyBtn.disabled=false; verifyBtn.textContent=tx("verify");
-      if(r&&r.ok&&r.token){ try{localStorage.setItem(TK,r.token);}catch(e){} window.NORM_SESSION=r.token; try{localStorage.setItem(EM,r.email||curEmail);}catch(e){} hideGate(); showChip(r.email||curEmail); }
-      else { var er=(r&&r.error)||""; err(tx(er==="expired"?"e_expired":er==="locked"?"e_locked":"e_wrong")); }
+      if(r&&r.ok&&r.token){
+        try{localStorage.setItem(TK,r.token); localStorage.setItem(EM,r.email||curEmail); localStorage.setItem(NM,r.name||name); localStorage.setItem(RL,r.role||role);}catch(e){}
+        window.NORM_SESSION=r.token; window.NORM_NAME=r.name||name; window.NORM_ROLE=r.role||role;
+        prefillSubmitter(); hideGate(); showChip();
+      } else { var er=(r&&r.error)||""; err(tx(er==="expired"?"e_expired":er==="locked"?"e_locked":"e_wrong")); }
     }).catch(function(){ verifyBtn.disabled=false; verifyBtn.textContent=tx("verify"); err(tx("e_net")); });
   }
   function hideGate(){ if(gate&&gate.parentNode){ gate.parentNode.removeChild(gate); gate=null; } }
-  function showChip(em){
+  function prefillSubmitter(){ try{ var mi=document.getElementById("m-submitter"); if(mi&&!mi.value&&window.NORM_NAME){ mi.value=window.NORM_NAME; } }catch(e){} }
+  function roleLabel(v){ for(var i=0;i<ROLES.length;i++){ if(ROLES[i][0]===v) return ROLES[i][AR()?1:0]; } return v||""; }
+  function showChip(){
     var old=document.getElementById("norm-signed"); if(old) old.remove();
     var chip=document.createElement("div"); chip.id="norm-signed"; chip.setAttribute("dir",AR()?"rtl":"ltr");
-    chip.innerHTML='<span>'+tx("signedin")+' · '+(em||"")+'</span><a id="norm-so">'+tx("signout")+'</a>';
+    var who=(window.NORM_NAME||savedName||"")+(window.NORM_ROLE?(" · "+roleLabel(window.NORM_ROLE)):"");
+    chip.innerHTML='<span class="ng-dot"></span><span>'+who+'</span><a id="norm-so">'+tx("signout")+'</a>';
     document.body.appendChild(chip);
     chip.querySelector("#norm-so").addEventListener("click",function(){ try{localStorage.removeItem(TK);}catch(e){} window.NORM_SESSION=""; location.reload(); });
   }
+  function playIntro(){
+    if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var lg=logoSrc();
+    var wrap=document.createElement("div"); wrap.id="norm-intro"; wrap.setAttribute("aria-hidden","true");
+    wrap.innerHTML='<div class="ni-in">'+(lg?('<img class="ni-logo" src="'+lg+'" alt="Norm">'):'<span class="ni-word">NORM</span>')+'</div>';
+    document.body.appendChild(wrap);
+    var gone=false;
+    function finish(){ if(gone)return; gone=true; if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }
+    wrap.addEventListener("animationend",function(e){ if(e.animationName==="niLift") finish(); });
+    setTimeout(finish,2400);
+  }
   window.NORM_signOut=function(){ try{localStorage.removeItem(TK);}catch(e){} location.reload(); };
-  if(tok){ showChip(savedEmail); } else { buildGate(); }
+  if(tok){ prefillSubmitter(); showChip(); } else { buildGate(); playIntro(); }
 })();
 </script>
 </body>
