@@ -1483,7 +1483,7 @@ function payload(){
   const today=new Date(); const date=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
   const printItems=[], choices={}, printList=[];
   itemEls.forEach(r=>{ if(selected.has(r.id)&&r.pr&&!DIGITAL.has(r.en)){ printItems.push(r.en); choices[r.en]=fmtText(r.id); const arch=dieArch(r.en); const dieUrl=arch==="carton"?"https://www.templatemaker.nl/en/mailer/":arch==="bag"?"https://www.templatemaker.nl/en/bag/":arch==="cup"?"https://www.templatemaker.nl/en/cup/":"https://www.templatemaker.nl/"; printList.push({n:r[LANG], f:fmtText(r.id), key:r.en, s:specDeck(r), sz:dimsLabel(r), die:dieUrl}); } });
-  return {LANG:LANG,SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),printItems,choices,printList};
+  return {LANG:LANG,SESSION:(window.NORM_SESSION||""),SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),printItems,choices,printList};
 }
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbzuMHIjT48xGeX1FchIA1YiIZiuIZgYgZCNrDYTgintWRUsqNZNtUKgkDTtKuYNVVho/exec";
 function loadingHTML(){
@@ -1751,6 +1751,101 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     toast();
   }
   setTimeout(restore,60);
+})();
+
+/* ===== sign-in gate: passwordless emailed code ===== */
+(function(){
+  var TK="norm_session_v1", EM="norm_email_v1";
+  var tok=""; try{ tok=localStorage.getItem(TK)||""; }catch(e){}
+  window.NORM_SESSION=tok;
+  var savedEmail=""; try{ savedEmail=localStorage.getItem(EM)||""; }catch(e){}
+  function AR(){ return (typeof LANG!=="undefined") ? LANG==="ar" : (document.documentElement.lang==="ar"); }
+  var T={
+    title:["Sign in to Norm","الدخول إلى Norm"],
+    sub:["Enter your work email — we'll send a one-time code.","أدخل بريدك المهني — سنرسل إليك رمزًا لمرة واحدة."],
+    send:["Send code","إرسال الرمز"], verify:["Verify & continue","تحقّق وتابع"],
+    codesub:["Enter the 6-digit code we emailed to","أدخل الرمز المكوّن من 6 أرقام المُرسل إلى"],
+    resend:["Resend code","إعادة إرسال الرمز"], change:["Use a different email","استخدام بريد آخر"],
+    sending:["Sending…","جارٍ الإرسال…"], checking:["Checking…","جارٍ التحقّق…"],
+    e_email:["Enter a valid email.","أدخل بريدًا صحيحًا."], e_send:["Couldn't send the code. Try again.","تعذّر إرسال الرمز. حاول مجددًا."],
+    e_wrong:["Incorrect code.","رمز غير صحيح."], e_expired:["Code expired — request a new one.","انتهت صلاحية الرمز — اطلب رمزًا جديدًا."],
+    e_locked:["Too many attempts — request a new code.","محاولات كثيرة — اطلب رمزًا جديدًا."], e_net:["Connection problem. Try again.","مشكلة اتصال. حاول مجددًا."],
+    signedin:["Signed in","مُسجّل الدخول"], signout:["Sign out","تسجيل الخروج"]
+  };
+  function tx(k){ return T[k][AR()?1:0]; }
+  var css=document.createElement("style");
+  css.textContent=
+  "#norm-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(120% 90% at 50% 0%,rgba(215,33,32,.06),transparent 55%),#ECECE8;font-family:var(--display),system-ui,sans-serif;}"+
+  "#norm-gate .ng-card{width:100%;max-width:380px;background:#FCFCFA;border:1px solid #DEDDD6;border-radius:18px;padding:28px 26px;box-shadow:0 30px 80px -30px rgba(23,24,28,.35);}"+
+  "#norm-gate .ng-logo{font-weight:800;font-size:20px;letter-spacing:.06em;color:#17181C;margin-bottom:16px;}"+
+  "#norm-gate h2{margin:0 0 6px;font-size:19px;color:#17181C;font-weight:700;}"+
+  "#norm-gate p{margin:0 0 16px;font-size:13.5px;color:#74756F;line-height:1.6;}"+
+  "#norm-gate input{width:100%;box-sizing:border-box;padding:12px 14px;font-size:15px;border:1px solid #CFCEC5;border-radius:11px;background:#fff;color:#17181C;outline:none;font-family:inherit;}"+
+  "#norm-gate input:focus{border-color:#d72120;}"+
+  "#norm-gate .ng-btn{width:100%;margin-top:12px;padding:12px 14px;font-size:14.5px;font-weight:700;color:#fff;background:#d72120;border:0;border-radius:11px;cursor:pointer;font-family:inherit;}"+
+  "#norm-gate .ng-btn:hover{background:#c01d1c;}#norm-gate .ng-btn:disabled{opacity:.6;cursor:default;}"+
+  "#norm-gate .ng-code{text-align:center;letter-spacing:.4em;font-size:20px;font-family:var(--mono),monospace;}"+
+  "#norm-gate .ng-links{margin-top:14px;font-size:12.5px;display:flex;gap:12px;flex-wrap:wrap;}"+
+  "#norm-gate .ng-links a{color:#74756F;cursor:pointer;text-decoration:underline;text-underline-offset:2px;}"+
+  "#norm-gate .ng-links a:hover{color:#d72120;}"+
+  "#norm-gate .ng-err{margin-top:12px;font-size:13px;color:#d72120;}"+
+  "#norm-signed{position:fixed;top:10px;z-index:9990;display:inline-flex;align-items:center;gap:9px;background:#FCFCFA;border:1px solid #DEDDD6;border-radius:999px;padding:6px 12px;font-size:12px;color:#74756F;box-shadow:0 2px 8px rgba(23,24,28,.06);font-family:var(--mono),monospace;}"+
+  "#norm-signed a{color:#d72120;cursor:pointer;text-decoration:none;font-weight:700;}"+
+  "html:not(.ar) #norm-signed{right:14px;}html.ar #norm-signed{left:14px;}";
+  document.head.appendChild(css);
+  var gate,emailStep,codeStep,emailInp,codeInp,sendBtn,verifyBtn,errBox,subEl,curEmail="";
+  function err(m){ errBox.textContent=m||""; errBox.style.display=m?"":"none"; }
+  function lang(){ return (typeof LANG!=="undefined")?LANG:"en"; }
+  function buildGate(){
+    gate=document.createElement("div"); gate.id="norm-gate"; gate.setAttribute("dir",AR()?"rtl":"ltr");
+    gate.innerHTML='<div class="ng-card" role="dialog" aria-modal="true"><div class="ng-logo">NORM</div><h2 id="ng-t"></h2><p id="ng-s"></p>'+
+      '<div id="ng-es"><input id="ng-e" type="email" autocomplete="email" placeholder="you@agency.com"><button class="ng-btn" id="ng-send"></button></div>'+
+      '<div id="ng-cs" hidden><input id="ng-c" class="ng-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="••••••"><button class="ng-btn" id="ng-v"></button>'+
+      '<div class="ng-links"><a id="ng-re"></a><a id="ng-ch"></a></div></div><div class="ng-err" id="ng-err" style="display:none"></div></div>';
+    document.body.appendChild(gate);
+    emailStep=gate.querySelector("#ng-es"); codeStep=gate.querySelector("#ng-cs");
+    emailInp=gate.querySelector("#ng-e"); codeInp=gate.querySelector("#ng-c");
+    sendBtn=gate.querySelector("#ng-send"); verifyBtn=gate.querySelector("#ng-v");
+    errBox=gate.querySelector("#ng-err"); subEl=gate.querySelector("#ng-s");
+    gate.querySelector("#ng-t").textContent=tx("title"); subEl.textContent=tx("sub");
+    sendBtn.textContent=tx("send"); verifyBtn.textContent=tx("verify");
+    gate.querySelector("#ng-re").textContent=tx("resend"); gate.querySelector("#ng-ch").textContent=tx("change");
+    if(savedEmail) emailInp.value=savedEmail;
+    sendBtn.addEventListener("click",doSend); verifyBtn.addEventListener("click",doVerify);
+    emailInp.addEventListener("keydown",function(e){ if(e.key==="Enter") doSend(); });
+    codeInp.addEventListener("keydown",function(e){ if(e.key==="Enter") doVerify(); });
+    gate.querySelector("#ng-re").addEventListener("click",function(){ if(curEmail) sendCode(curEmail); });
+    gate.querySelector("#ng-ch").addEventListener("click",function(){ err(""); codeStep.hidden=true; emailStep.hidden=false; subEl.textContent=tx("sub"); try{emailInp.focus();}catch(e){} });
+    setTimeout(function(){ try{ emailInp.focus(); }catch(e){} },80);
+  }
+  function doSend(){ var em=(emailInp.value||"").trim(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ err(tx("e_email")); return; } sendCode(em); }
+  function sendCode(em){
+    err(""); sendBtn.disabled=true; sendBtn.textContent=tx("sending");
+    aiFetch({auth:"request",email:em,lang:lang()}).then(function(r){
+      sendBtn.disabled=false; sendBtn.textContent=tx("send");
+      if(r&&r.ok){ curEmail=em; try{localStorage.setItem(EM,em);}catch(e){} emailStep.hidden=true; codeStep.hidden=false; subEl.textContent=tx("codesub")+" "+em+"."; codeInp.value=""; try{codeInp.focus();}catch(e){} err(""); }
+      else err(tx(r&&r.error==="invalid email"?"e_email":"e_send"));
+    }).catch(function(){ sendBtn.disabled=false; sendBtn.textContent=tx("send"); err(tx("e_net")); });
+  }
+  function doVerify(){
+    var code=(codeInp.value||"").trim(); if(code.length<4){ err(tx("e_wrong")); return; }
+    err(""); verifyBtn.disabled=true; verifyBtn.textContent=tx("checking");
+    aiFetch({auth:"verify",email:curEmail,code:code,lang:lang()}).then(function(r){
+      verifyBtn.disabled=false; verifyBtn.textContent=tx("verify");
+      if(r&&r.ok&&r.token){ try{localStorage.setItem(TK,r.token);}catch(e){} window.NORM_SESSION=r.token; try{localStorage.setItem(EM,r.email||curEmail);}catch(e){} hideGate(); showChip(r.email||curEmail); }
+      else { var er=(r&&r.error)||""; err(tx(er==="expired"?"e_expired":er==="locked"?"e_locked":"e_wrong")); }
+    }).catch(function(){ verifyBtn.disabled=false; verifyBtn.textContent=tx("verify"); err(tx("e_net")); });
+  }
+  function hideGate(){ if(gate&&gate.parentNode){ gate.parentNode.removeChild(gate); gate=null; } }
+  function showChip(em){
+    var old=document.getElementById("norm-signed"); if(old) old.remove();
+    var chip=document.createElement("div"); chip.id="norm-signed"; chip.setAttribute("dir",AR()?"rtl":"ltr");
+    chip.innerHTML='<span>'+tx("signedin")+' · '+(em||"")+'</span><a id="norm-so">'+tx("signout")+'</a>';
+    document.body.appendChild(chip);
+    chip.querySelector("#norm-so").addEventListener("click",function(){ try{localStorage.removeItem(TK);}catch(e){} window.NORM_SESSION=""; location.reload(); });
+  }
+  window.NORM_signOut=function(){ try{localStorage.removeItem(TK);}catch(e){} location.reload(); };
+  if(tok){ showChip(savedEmail); } else { buildGate(); }
 })();
 </script>
 </body>
