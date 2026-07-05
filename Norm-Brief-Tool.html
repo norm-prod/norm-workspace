@@ -1793,7 +1793,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     e_send:["Couldn't send the code. Try again.","تعذّر إرسال الرمز. حاول مجددًا."],
     e_wrong:["Incorrect code.","رمز غير صحيح."], e_expired:["Code expired — request a new one.","انتهت صلاحية الرمز — اطلب رمزًا جديدًا."],
     e_locked:["Too many attempts — request a new code.","محاولات كثيرة — اطلب رمزًا جديدًا."], e_net:["Connection problem. Try again.","مشكلة اتصال. حاول مجددًا."],
-    signout:["Sign out","خروج"]
+    signout:["Sign out","خروج"], signin:["Sign in","تسجيل الدخول"]
   };
   var ROLES=[["Account Manager","مدير حساب"],["Agency Partner","شريك وكالة"],["Creative Director","مدير إبداعي"],["Client","عميل"],["Other","أخرى"]];
   function tx(k){ return T[k][AR()?1:0]; }
@@ -1868,6 +1868,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
       '<div class="ng-err" id="ng-err" style="display:none"></div>'+
       '<div class="ng-lang"><button type="button" data-l="en">EN</button><button type="button" data-l="ar">عربي</button></div></div>';
     document.body.appendChild(gate);
+    gate.addEventListener("click",function(e){ if(e.target===gate){ hideGate(function(){ showSignIn(); }); } });
     emailStep=g("ng-es"); codeStep=g("ng-cs"); emailInp=g("ng-e"); codeInp=g("ng-c"); nameInp=g("ng-n"); roleSel=g("ng-r");
     sendBtn=g("ng-send"); verifyBtn=g("ng-v"); errBox=g("ng-err"); subEl=g("ng-s");
     if(savedEmail) emailInp.value=savedEmail; if(savedName) nameInp.value=savedName;
@@ -1905,7 +1906,16 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   function hideGate(after){ if(!gate){ if(after) after(); return; } var el=gate; gate=null; el.classList.add("ng-out"); var d=false; function fin(){ if(d)return; d=true; if(el.parentNode) el.parentNode.removeChild(el); if(after) after(); } el.addEventListener("animationend",fin); setTimeout(fin,380); }
   function prefillSubmitter(){ try{ var mi=document.getElementById("m-submitter"); if(mi&&!mi.value&&window.NORM_NAME){ mi.value=window.NORM_NAME; } }catch(e){} }
   function roleLabel(v){ for(var i=0;i<ROLES.length;i++){ if(ROLES[i][0]===v) return ROLES[i][AR()?1:0]; } return v||""; }
+  function showSignIn(){
+    if(window.NORM_SESSION) return; if(document.getElementById("norm-signin-btn")) return;
+    var btn=document.createElement("button"); btn.id="norm-signin-btn"; btn.type="button"; btn.textContent=tx("signin");
+    btn.style.cssText="position:fixed;top:11px;z-index:9990;background:#d72120;color:#fff;border:0;border-radius:999px;padding:8px 17px;font-family:var(--display),system-ui,sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px -5px rgba(215,33,32,.55);";
+    btn.style[AR()?"left":"right"]="14px";
+    btn.addEventListener("click",function(){ if(btn.parentNode) btn.parentNode.removeChild(btn); buildGate(); });
+    document.body.appendChild(btn);
+  }
   function showChip(){
+    var _sib=document.getElementById("norm-signin-btn"); if(_sib) _sib.remove();
     var old=document.getElementById("norm-signed"); if(old) old.remove();
     var chip=document.createElement("div"); chip.id="norm-signed"; chip.setAttribute("dir",AR()?"rtl":"ltr");
     var who=(window.NORM_NAME||savedName||"")+(window.NORM_ROLE?(" · "+roleLabel(window.NORM_ROLE)):"");

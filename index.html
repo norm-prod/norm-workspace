@@ -493,6 +493,7 @@
       '<div class="ng-err" id="ng-err" style="display:none"></div>'+
       '<div class="ng-lang"><button type="button" data-l="en">EN</button><button type="button" data-l="ar">عربي</button></div></div>';
     document.body.appendChild(gate);
+    gate.addEventListener("click",function(e){ if(e.target===gate){ onOk=null; hideGate(function(){ renderAuth(); }); } });
     emailStep=g("ng-es"); codeStep=g("ng-cs"); emailInp=g("ng-e"); codeInp=g("ng-c"); nameInp=g("ng-n"); roleSel=g("ng-r");
     sendBtn=g("ng-send"); verifyBtn=g("ng-v"); errBox=g("ng-err"); subEl=g("ng-s");
     if(savedEmail) emailInp.value=savedEmail; if(savedName) nameInp.value=savedName;
