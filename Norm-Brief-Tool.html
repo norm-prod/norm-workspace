@@ -1784,9 +1784,9 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
 
   var css=document.createElement("style");
   css.textContent=
-  "#norm-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(90% 60% at 50% -5%,rgba(215,33,32,.07),transparent 60%),radial-gradient(70% 50% at 100% 100%,rgba(224,169,59,.05),transparent 60%),#EDEDE9;font-family:var(--display),system-ui,sans-serif;}"+
-  "#norm-gate .ng-card{position:relative;width:100%;max-width:400px;background:#FCFCFA;border:1px solid #E4E3DC;border-radius:20px;padding:34px 32px 30px;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 40px 90px -32px rgba(23,24,28,.4);overflow:hidden;}"+
-  "#norm-gate .ng-accent{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d72120,#E5443F 55%,#E0A93B);}"+
+  "#norm-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:22px;background:rgba(24,25,28,.34);backdrop-filter:blur(16px) saturate(1.06);-webkit-backdrop-filter:blur(16px) saturate(1.06);font-family:var(--display),system-ui,sans-serif;animation:ngFade .34s ease both;}"+
+  "#norm-gate .ng-card{position:relative;width:100%;max-width:400px;background:#FCFCFA;border:1px solid rgba(255,255,255,.55);border-radius:20px;padding:34px 32px 30px;box-shadow:0 1px 0 rgba(255,255,255,.85) inset,0 50px 100px -28px rgba(0,0,0,.5),0 14px 44px -22px rgba(0,0,0,.42);overflow:hidden;animation:ngCard .52s cubic-bezier(.34,1.42,.5,1) .05s both;}"+
+  "#norm-gate .ng-accent{position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d72120,#E5443F 55%,#E0A93B);transform-origin:left;animation:ngAccent .55s cubic-bezier(.4,0,.2,1) .2s both;}"+
   "#norm-gate .ng-head{display:flex;align-items:center;gap:11px;margin-bottom:22px;}"+
   "#norm-gate .ng-logo{height:22px;width:auto;display:block;}"+
   "#norm-gate .ng-wsx{font-size:11.5px;font-weight:700;letter-spacing:.14em;color:#A6A69E;font-family:var(--mono),monospace;text-transform:uppercase;padding-inline-start:11px;border-inline-start:1px solid #E4E3DC;}"+
@@ -1799,8 +1799,8 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   "#norm-gate input:focus,#norm-gate .ng-sel:focus{border-color:#d72120;box-shadow:0 0 0 3px rgba(215,33,32,.12);}"+
   "#norm-gate input+.ng-lbl,#norm-gate .ng-sel+.ng-lbl{margin-top:16px;}"+
   "#norm-gate .ng-code{text-align:center;letter-spacing:.5em;font-size:22px;font-weight:700;font-family:var(--mono),monospace;padding-inline-start:calc(15px + .5em);}"+
-  "#norm-gate .ng-btn{width:100%;margin-top:22px;padding:13px 15px;font-size:15px;font-weight:700;color:#fff;background:#d72120;border:0;border-radius:12px;cursor:pointer;font-family:inherit;transition:background .15s,transform .05s;}"+
-  "#norm-gate .ng-btn:hover{background:#c01d1c;}#norm-gate .ng-btn:active{transform:translateY(1px);}#norm-gate .ng-btn:disabled{opacity:.55;cursor:default;}"+
+  "#norm-gate .ng-btn{width:100%;margin-top:22px;padding:13px 15px;font-size:15px;font-weight:700;color:#fff;background:#d72120;border:0;border-radius:12px;cursor:pointer;font-family:inherit;box-shadow:0 8px 20px -10px rgba(215,33,32,.55);transition:background .15s,transform .12s,box-shadow .2s;}"+
+  "#norm-gate .ng-btn:hover{background:#c01d1c;transform:translateY(-1px);box-shadow:0 13px 28px -10px rgba(215,33,32,.65);}#norm-gate .ng-btn:active{transform:translateY(1px);box-shadow:0 5px 14px -8px rgba(215,33,32,.5);}#norm-gate .ng-btn:disabled{opacity:.55;cursor:default;box-shadow:none;transform:none;}"+
   "#norm-gate .ng-links{margin-top:16px;font-size:12.5px;display:flex;gap:16px;flex-wrap:wrap;}"+
   "#norm-gate .ng-links a{color:#74756F;cursor:pointer;text-decoration:none;border-bottom:1px solid #D6D5CC;padding-bottom:1px;}"+
   "#norm-gate .ng-links a:hover{color:#d72120;border-color:#d72120;}"+
@@ -1820,6 +1820,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   "#norm-intro .ni-word{font-weight:800;font-size:26px;letter-spacing:.08em;color:#17181C;}"+
   "@keyframes niIn{to{opacity:1;transform:none}}@keyframes niLift{to{transform:translateY(-101%)}}";
   document.head.appendChild(css);
+  var css2=document.createElement("style"); css2.textContent='@keyframes ngFade{from{opacity:0}to{opacity:1}}@keyframes ngCard{from{opacity:0;transform:translateY(14px) scale(.955)}to{opacity:1;transform:none}}@keyframes ngAccent{from{transform:scaleX(0)}to{transform:scaleX(1)}}@keyframes ngFadeOut{to{opacity:0}}@keyframes ngCardOut{to{opacity:0;transform:translateY(8px) scale(.97)}}@keyframes signinPulse{0%,100%{box-shadow:0 4px 14px -6px rgba(215,33,32,.4)}50%{box-shadow:0 5px 20px -3px rgba(215,33,32,.72)}}html.ar #norm-gate .ng-accent{transform-origin:right;}#norm-gate.ng-out{animation:ngFadeOut .3s ease forwards;}#norm-gate.ng-out .ng-card{animation:ngCardOut .3s cubic-bezier(.4,0,1,1) forwards;}@media(prefers-reduced-motion:reduce){#norm-gate,#norm-gate .ng-card,#norm-gate .ng-accent{animation-duration:.01s!important;}.signin-btn{animation:none!important;}}'; document.head.appendChild(css2);
 
   var gate,emailStep,codeStep,emailInp,codeInp,nameInp,roleSel,sendBtn,verifyBtn,errBox,subEl,curEmail="",curStep="email";
   function g(id){ return gate.querySelector("#"+id); }
@@ -1880,11 +1881,11 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
       if(r&&r.ok&&r.token){
         try{localStorage.setItem(TK,r.token); localStorage.setItem(EM,r.email||curEmail); localStorage.setItem(NM,r.name||name); localStorage.setItem(RL,r.role||role);}catch(e){}
         window.NORM_SESSION=r.token; window.NORM_NAME=r.name||name; window.NORM_ROLE=r.role||role;
-        prefillSubmitter(); hideGate(); showChip();
+        prefillSubmitter(); hideGate(function(){ showChip(); });
       } else { var er=(r&&r.error)||""; err(tx(er==="expired"?"e_expired":er==="locked"?"e_locked":"e_wrong")); }
     }).catch(function(){ verifyBtn.disabled=false; verifyBtn.textContent=tx("verify"); err(tx("e_net")); });
   }
-  function hideGate(){ if(gate&&gate.parentNode){ gate.parentNode.removeChild(gate); gate=null; } }
+  function hideGate(after){ if(!gate){ if(after) after(); return; } var el=gate; gate=null; el.classList.add("ng-out"); var d=false; function fin(){ if(d)return; d=true; if(el.parentNode) el.parentNode.removeChild(el); if(after) after(); } el.addEventListener("animationend",fin); setTimeout(fin,380); }
   function prefillSubmitter(){ try{ var mi=document.getElementById("m-submitter"); if(mi&&!mi.value&&window.NORM_NAME){ mi.value=window.NORM_NAME; } }catch(e){} }
   function roleLabel(v){ for(var i=0;i<ROLES.length;i++){ if(ROLES[i][0]===v) return ROLES[i][AR()?1:0]; } return v||""; }
   function showChip(){
