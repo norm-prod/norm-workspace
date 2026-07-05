@@ -1485,7 +1485,7 @@ function payload(){
   itemEls.forEach(r=>{ if(selected.has(r.id)&&r.pr&&!DIGITAL.has(r.en)){ printItems.push(r.en); choices[r.en]=fmtText(r.id); const arch=dieArch(r.en); const dieUrl=arch==="carton"?"https://www.templatemaker.nl/en/mailer/":arch==="bag"?"https://www.templatemaker.nl/en/bag/":arch==="cup"?"https://www.templatemaker.nl/en/cup/":"https://www.templatemaker.nl/"; printList.push({n:r[LANG], f:fmtText(r.id), key:r.en, s:specDeck(r), sz:dimsLabel(r), die:dieUrl}); } });
   return {LANG:LANG,SESSION:(window.NORM_SESSION||""),BRIEFID:(window.NORM_BRIEFID||""),SUBMITTER_ROLE:(window.NORM_ROLE||""),SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),printItems,choices,printList};
 }
-const WEBAPP_URL="https://script.google.com/macros/s/AKfycbzuMHIjT48xGeX1FchIA1YiIZiuIZgYgZCNrDYTgintWRUsqNZNtUKgkDTtKuYNVVho/exec";
+const WEBAPP_URL="https://script.google.com/macros/s/AKfycbwHB6kvclJyvWRQDxJdF9fOX-uLscgvk7wNNFP-7ucqO0Y6PkpMC82PqndzDd5tYLvnOg/exec";
 function loadingHTML(){
   const ar=LANG==="ar";
   const logo=(document.querySelector(".brandlogo")||{}).src||"";
