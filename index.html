@@ -246,8 +246,8 @@
             <span class="status live"><span class="dot"></span><span data-en="Live" data-ar="متاح">Live</span></span>
           </div>
           <div class="p-body">
-            <h2 class="p-title" data-en="Visual Identity Brief" data-ar="موجز الهوية البصرية">Visual Identity Brief</h2>
-            <p class="p-desc" data-en="Build a complete bilingual brief and generate a ready Google Slides deck." data-ar="جهّز موجزًا متكاملًا بالعربية والإنجليزية، واحصل على عرض Google Slides جاهز.">Build a complete bilingual brief and generate a ready Google Slides deck.</p>
+            <h2 class="p-title" data-en="Visual Identity Brief" data-ar="بريف الهوية البصرية">Visual Identity Brief</h2>
+            <p class="p-desc" data-en="Build a complete bilingual brief and generate a ready Google Slides deck." data-ar="جهّز بريفًا متكاملًا بالعربية والإنجليزية، واحصل على عرض Google Slides جاهز.">Build a complete bilingual brief and generate a ready Google Slides deck.</p>
             <span class="p-cta"><span data-en="Open the tool" data-ar="افتح الأداة">Open the tool</span><span class="arw" aria-hidden="true">→</span></span>
           </div>
         </a>
@@ -494,23 +494,37 @@
       '<div class="ng-lang"><button type="button" data-l="en">EN</button><button type="button" data-l="ar">عربي</button></div></div>';
     document.body.appendChild(gate);
     gate.addEventListener("click",function(e){ if(e.target===gate){ onOk=null; hideGate(function(){ renderAuth(); }); } });
+    if(!window.__ngEsc){ window.__ngEsc=true; document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&gate){ onOk=null; hideGate(function(){ renderAuth(); }); } }); }
     emailStep=g("ng-es"); codeStep=g("ng-cs"); emailInp=g("ng-e"); codeInp=g("ng-c"); nameInp=g("ng-n"); roleSel=g("ng-r");
     sendBtn=g("ng-send"); verifyBtn=g("ng-v"); errBox=g("ng-err"); subEl=g("ng-s");
     if(savedEmail) emailInp.value=savedEmail; if(savedName) nameInp.value=savedName;
     applyGateText();
     sendBtn.addEventListener("click",doSend); verifyBtn.addEventListener("click",doVerify);
     emailInp.addEventListener("keydown",function(e){ if(e.key==="Enter") doSend(); });
+    codeInp.addEventListener("input",function(){ var v=codeInp.value.replace(/\D/g,"").slice(0,6); if(v!==codeInp.value) codeInp.value=v; if(v.length===6){ try{ nameInp.focus(); }catch(e){} } });
+    codeInp.addEventListener("keydown",function(e){ if(e.key==="Enter"){ if((nameInp.value||"").trim()) doVerify(); else { try{ nameInp.focus(); }catch(_){} } } });
+    nameInp.addEventListener("keydown",function(e){ if(e.key==="Enter") doVerify(); });
+    roleSel.addEventListener("keydown",function(e){ if(e.key==="Enter") doVerify(); });
     g("ng-re").addEventListener("click",function(){ if(curEmail) sendCode(curEmail); });
     g("ng-ch").addEventListener("click",function(){ err(""); curStep="email"; codeStep.hidden=true; emailStep.hidden=false; subEl.textContent=tx("sub"); try{emailInp.focus();}catch(e){} });
     Array.prototype.forEach.call(gate.querySelectorAll(".ng-lang button"),function(bn){ bn.addEventListener("click",function(){ var l=bn.getAttribute("data-l"); if(typeof setLang==="function"){ try{ setLang(l); }catch(e){} } applyGateText(); }); });
     setTimeout(function(){ try{ emailInp.focus(); }catch(e){} },80);
   }
+  function startCooldown(){
+    var re=g("ng-re"); if(!re) return; var until=Date.now()+30000; window.__ngCooldownT=until;
+    re.style.opacity=".45"; re.style.pointerEvents="none";
+    var iv=setInterval(function(){ var left=Math.ceil((until-Date.now())/1000);
+      if(left<=0){ clearInterval(iv); if(gate&&g("ng-re")){ g("ng-re").textContent=tx("resend"); g("ng-re").style.opacity=""; g("ng-re").style.pointerEvents=""; } window.__ngCooldownT=0; return; }
+      if(gate&&g("ng-re")) g("ng-re").textContent=tx("resend")+" ("+left+")";
+    },500);
+  }
   function doSend(){ var em=(emailInp.value||"").trim(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ err(tx("e_email")); return; } sendCode(em); }
   function sendCode(em){
+    if(window.__ngCooldownT && Date.now()<window.__ngCooldownT){ return; }
     err(""); sendBtn.disabled=true; sendBtn.textContent=tx("sending");
     aiFetch({auth:"request",email:em,lang:lng()}).then(function(r){
       sendBtn.disabled=false; sendBtn.textContent=tx("send");
-      if(r&&r.ok){ curEmail=em; curStep="code"; try{localStorage.setItem(EM,em);}catch(e){} emailStep.hidden=true; codeStep.hidden=false; subEl.textContent=tx("codesub")+" "+em+"."; codeInp.value=""; try{codeInp.focus();}catch(e){} err(""); }
+      if(r&&r.ok){ curEmail=em; curStep="code"; try{localStorage.setItem(EM,em);}catch(e){} emailStep.hidden=true; codeStep.hidden=false; startCooldown(); subEl.textContent=tx("codesub")+" "+em+"."; codeInp.value=""; try{codeInp.focus();}catch(e){} err(""); }
       else err(tx(r&&r.error==="invalid email"?"e_email":"e_send"));
     }).catch(function(){ sendBtn.disabled=false; sendBtn.textContent=tx("send"); err(tx("e_net")); });
   }
