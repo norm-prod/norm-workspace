@@ -1453,18 +1453,19 @@ function fmtText(id){ const r=itemEls.find(x=>x.id===id); if(laterItems.has(id))
   if(k==="shape"){ if(f.shape==="round") return t("shp_round")+" · \u2300"+f.w+" mm"; return t(f.shape==="square"?"shp_square":"shp_rect")+" · "+f.w+"\u00D7"+f.h+" mm"; }
   return t(orientKey(f.w,f.h))+" · "+f.w+"\u00D7"+f.h+" mm"; }
 const CORE_SCOPE=25;
-function scopeLines(){ const out=[]; let prem=0, total=0; const premNames=[];
+function scopeLines(){ const out=[]; let prem=0, extra=0, total=0; const premNames=[],extraNames=[];
   DATA.forEach((cat,ci)=>{ const chosen=catRefs[ci].ids.filter(id=>selected.has(id)); if(!chosen.length)return;
     if(out.length)out.push("");
     out.push(cat[LANG]);
-    chosen.forEach(id=>{ const r=itemEls.find(x=>x.id===id); total++; const isPrem=!!r.billcat; if(isPrem){prem++; premNames.push(r[LANG]);}
+    chosen.forEach(id=>{ const r=itemEls.find(x=>x.id===id); total++; const isPrem=!!r.billcat, isExtra=!isPrem&&billSet.has(id); if(isPrem){prem++; premNames.push(r[LANG]);} if(isExtra){extra++; extraNames.push(r[LANG]);}
       const sp=spec[id]; const nt=(cat.pr&&sp&&sp.note&&sp.note.trim())?("  \u2014 "+sp.note.trim()):"";
-      out.push(("\u2022  "+(isPrem?"\u25C6 ":"")+r[LANG]+(cat.pr?("  \u2014 "+fmtText(id)):"")+nt).replace(/ (mm|\u0645\u0645)\b/g,"\u00A0$1")); });
+      const marker=isPrem?"\u25C6 ":(isExtra?"\u25C7 ":"");
+      out.push(("\u2022  "+marker+r[LANG]+(cat.pr?("  \u2014 "+fmtText(id)):"")+nt).replace(/ (mm|\u0645\u0645)\b/g,"\u00A0$1")); });
   });
-  window.__premCount=prem; window.__premNames=premNames; window.__totalCount=total;
+  window.__premCount=prem; window.__premNames=premNames; window.__extraCount=extra; window.__extraNames=extraNames; window.__totalCount=total;
   const head=[];
   if(prem>0) head.push((LANG==="ar"?"\u25C6 عناصر مميّزة خارج النطاق الأساسي: ":"\u25C6 Premium add-ons beyond core scope: ")+prem);
-  if(total>CORE_SCOPE) head.push((LANG==="ar"?("\u25C6 إجمالي العناصر "+total+" — يتجاوز النطاق الأساسي ("+CORE_SCOPE+")"):("\u25C6 Total items "+total+" \u2014 exceeds the core scope of "+CORE_SCOPE)));
+  if(extra>0) head.push((LANG==="ar"?"\u25C7 عناصر إضافية تتجاوز النطاق الأساسي: ":"\u25C7 Extra items beyond core scope: ")+extra);
   if(head.length){ out.unshift(""); for(let i=head.length-1;i>=0;i--) out.unshift(head[i]); }
   return out;
 }
@@ -1502,7 +1503,7 @@ function payload(){
   const today=new Date(); const date=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
   const printItems=[], choices={}, printList=[];
   itemEls.forEach(r=>{ if(selected.has(r.id)&&r.pr&&!DIGITAL.has(r.en)){ printItems.push(r.en); choices[r.en]=fmtText(r.id); const arch=dieArch(r.en); const dieUrl=arch==="carton"?"https://www.templatemaker.nl/en/mailer/":arch==="bag"?"https://www.templatemaker.nl/en/bag/":arch==="cup"?"https://www.templatemaker.nl/en/cup/":"https://www.templatemaker.nl/"; printList.push({n:r[LANG], f:fmtText(r.id), key:r.en, s:specDeck(r), sz:dimsLabel(r), die:dieUrl}); } });
-  return {LANG:LANG,SESSION:(window.NORM_SESSION||""),BRIEFID:(window.NORM_BRIEFID||""),SUBMITTER_ROLE:(window.NORM_ROLE||""),SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),PREMCOUNT:(window.__premCount||0),PREMLIST:(window.__premNames||[]),TOTALCOUNT:(window.__totalCount||0),printItems,choices,printList};
+  return {LANG:LANG,SESSION:(window.NORM_SESSION||""),BRIEFID:(window.NORM_BRIEFID||""),SUBMITTER_ROLE:(window.NORM_ROLE||""),SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),PREMCOUNT:(window.__premCount||0),PREMLIST:(window.__premNames||[]),EXTRACOUNT:(window.__extraCount||0),EXTRALIST:(window.__extraNames||[]),TOTALCOUNT:(window.__totalCount||0),printItems,choices,printList};
 }
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbwHB6kvclJyvWRQDxJdF9fOX-uLscgvk7wNNFP-7ucqO0Y6PkpMC82PqndzDd5tYLvnOg/exec";
 function loadingHTML(){
