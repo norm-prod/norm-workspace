@@ -1143,7 +1143,14 @@ document.getElementById("search").addEventListener("input",e=>{
   document.getElementById("noresults").classList.toggle("show",!any);
 });
 document.getElementById("toggle-all").addEventListener("click",e=>{ allCollapsed=!allCollapsed; catRefs.forEach(c=>c.el.classList.toggle("collapsed",allCollapsed)); e.target.textContent=allCollapsed?t("expandall"):t("collapseall"); });
-document.getElementById("clear-all").addEventListener("click",clearAll);
+document.getElementById("clear-all").addEventListener("click",function(){
+  var ar=(LANG==="ar");
+  showConfirm(ar?"مسح كل شيء؟":"Clear everything?",
+              ar?"سيؤدي هذا إلى مسح جميع الحقول والنطاق والبدء من جديد. لا يمكن التراجع.":"This clears every field and the scope, and starts a new brief. This can’t be undone.",
+              ar?"نعم، ابدأ من جديد":"Yes, start fresh",
+              ar?"إلغاء":"Cancel",
+              function(){ window.NORM_resetAll(); });
+});
 
 /* ---------- mockups ---------- */
 const grid=document.getElementById("mockgrid");
@@ -1785,7 +1792,30 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   document.addEventListener("click",saveSoon,true);
   window.addEventListener("beforeunload",function(e){ if(!bypassUnload && has()){ e.preventDefault(); e.returnValue=""; } });
   window.NORM_clearDraft=function(){ try{ localStorage.removeItem(KEY); }catch(e){} };
-  window.NORM_newBrief=function(){ bypassUnload=true; try{ if(window.NORM_SESSION){ var s=snap(); if(has(s)) saveServer(); } }catch(e){} window.NORM_clearDraft(); window.NORM_BRIEFID=""; location.reload(); };
+  // wipe fields on this page (no reload) — used by "Clear all" and "Start fresh"
+  function wipeFields(){
+    document.querySelectorAll('[id^="a-"], #m-submitter').forEach(function(el){ if(el.tagName==="INPUT"||el.tagName==="TEXTAREA"){ el.value=""; if(el.tagName==="TEXTAREA"){ el.style.height="auto"; } } });
+    try{ clearAll(); }catch(e){}                 // scope selection
+    try{ mSource=""; document.querySelectorAll('#m-source button').forEach(function(b){ b.classList.remove("on"); }); }catch(e){}
+    try{ tier=""; document.querySelectorAll('#m-tier button').forEach(function(b){ b.classList.remove("on"); }); }catch(e){}
+    try{ profile=""; document.querySelectorAll('.profcard.on').forEach(function(b){ b.classList.remove("on"); }); }catch(e){}
+    try{ updateGate&&updateGate(); updateScopeGate&&updateScopeGate(); refresh&&refresh(); }catch(e){}
+  }
+  // full reset: fields + local draft + server draft + block auto-restore, then land clean
+  window.NORM_resetAll=function(opts){
+    opts=opts||{}; bypassUnload=true; window.__ngNoRestore=true;
+    var doReset=function(){
+      window.NORM_clearDraft();
+      var oldId=window.NORM_BRIEFID; window.NORM_BRIEFID="";
+      // delete the server draft too, so it can't come back on any device
+      try{ if(window.NORM_SESSION && oldId) aiFetch({crm:"deletedraft",token:window.NORM_SESSION,id:oldId}).catch(function(){}); }catch(e){}
+      wipeFields();
+      if(window.NORM_refreshBriefs) window.NORM_refreshBriefs();
+      bypassUnload=false; setTimeout(function(){ window.__ngNoRestore=false; },1500);
+    };
+    doReset();
+  };
+  window.NORM_newBrief=function(){ window.NORM_resetAll(); try{ window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} };
   function toast(msg){
     var ar=(LANG==="ar"); var d=document.createElement("div");
     d.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:9998;display:flex;align-items:center;gap:13px;background:var(--ink,#17181C);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;box-shadow:0 18px 50px -16px rgba(0,0,0,.5);max-width:calc(100% - 32px);";
@@ -1825,6 +1855,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   window.NORM_restoreLocal=function(){ try{ restore(); }catch(e){} };
   // Cross-device: if signed in and there'''s no local draft, pull the most recent server draft.
   function restoreFromServer(){
+    if(window.__ngNoRestore) return;
     if(!window.NORM_SESSION) return;
     var hasLocal=false; try{ var r0=localStorage.getItem(KEY); hasLocal=!!(r0&&has(JSON.parse(r0))); }catch(e){}
     if(hasLocal) return; // local wins (most recent on this device)
