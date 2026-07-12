@@ -1106,7 +1106,7 @@ DATA.forEach((cat,ci)=>{
 function toggle(id){ const r=itemEls.find(x=>x.id===id); if(selected.has(id)){selected.delete(id);r.el.classList.remove("sel");r.el.setAttribute("aria-checked","false");}else{selected.add(id);r.el.classList.add("sel");r.el.setAttribute("aria-checked","true");} refresh(); }
 function selectAll(ci){ const c=catRefs[ci], on=c.ids.every(id=>selected.has(id)); c.ids.forEach(id=>{const r=itemEls.find(x=>x.id===id); if(on){selected.delete(id);r.el.classList.remove("sel");r.el.setAttribute("aria-checked","false");}else{selected.add(id);r.el.classList.add("sel");r.el.setAttribute("aria-checked","true");}}); refresh(); }
 function removeItem(id){ const r=itemEls.find(x=>x.id===id); selected.delete(id); delete vsel[id]; delete dims[id]; laterItems.delete(id); r.el.classList.remove("sel"); r.el.setAttribute("aria-checked","false"); buildMockups(); refresh(); }
-function clearAll(){ selected.clear(); for(const k in vsel)delete vsel[k]; for(const k in dims)delete dims[k]; laterItems.clear(); itemEls.forEach(r=>{r.el.classList.remove("sel");r.el.setAttribute("aria-checked","false");}); refresh(); }
+function clearAll(){ selected.clear(); recd.clear(); for(const k in vsel)delete vsel[k]; for(const k in dims)delete dims[k]; for(const k in spec)delete spec[k]; laterItems.clear(); itemEls.forEach(r=>{r.el.classList.remove("sel","recd");r.el.setAttribute("aria-checked","false");}); refresh(); }
 function refresh(){
   catRefs.forEach(c=>{ const n=c.ids.filter(id=>selected.has(id)).length; c.badgeEl.textContent=n+"/"+c.total; c.badgeEl.classList.toggle("has",n>0); c.navCountEl.textContent=n; c.navEl.classList.toggle("has",n>0); c.selallEl.textContent=(n===c.total&&c.total>0)?t("clearsec"):t("selall"); });
   document.getElementById("tc-sel").textContent=selected.size; document.getElementById("tc-tot").textContent=itemEls.length;
@@ -1829,14 +1829,16 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
       window.NORM_clearDraft();
       var oldId=window.NORM_BRIEFID; window.NORM_BRIEFID="";
       // delete the server draft too, so it can't come back on any device
-      try{ if(window.NORM_SESSION && oldId) aiFetch({crm:"deletedraft",token:window.NORM_SESSION,id:oldId}).catch(function(){}); }catch(e){}
+      var deletion=null;
+      try{ if(window.NORM_SESSION && oldId) deletion=aiFetch({crm:"deletedraft",token:window.NORM_SESSION,id:oldId}); }catch(e){}
       wipeFields();
-      if(window.NORM_refreshBriefs) window.NORM_refreshBriefs();
+      var refreshAfterDelete=function(){ try{ if(window.NORM_refreshBriefs) window.NORM_refreshBriefs(); }catch(e){} };
+      if(deletion&&typeof deletion.then==="function") deletion.then(refreshAfterDelete,refreshAfterDelete); else refreshAfterDelete();
       bypassUnload=false; setTimeout(function(){ window.__ngNoRestore=false; },1500);
     };
     doReset();
   };
-  window.NORM_newBrief=function(){ window.NORM_resetAll(); try{ window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} };
+  window.NORM_newBrief=function(){ window.NORM_resetAll(); try{ reached=0; setStep("brief"); window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} };
   function toast(msg){
     var ar=(LANG==="ar"); var d=document.createElement("div");
     d.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:9998;display:flex;align-items:center;gap:13px;background:var(--ink,#17181C);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;box-shadow:0 18px 50px -16px rgba(0,0,0,.5);max-width:calc(100% - 32px);";
@@ -2105,6 +2107,13 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   "#nb-list .nb-meta{margin-top:7px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#9A9A93;flex-wrap:wrap;}"+
   "#nb-list .nb-badge{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:999px;letter-spacing:.02em;}"+
   ".nb-b-draft{background:#F0EFEA;color:#8A8A82;}.nb-b-built{background:#E4F5EC;color:#1B8A5A;}.nb-b-prog{background:#E8EEFD;color:#3B5BC0;}.nb-b-deliv{background:#FBF1DC;color:#9A7B1E;}"+
+  "@keyframes nbScan{0%{transform:translateX(-140%)}100%{transform:translateX(240%)}}"+
+  ".nb-skeleton{position:relative;overflow:hidden;background:#fff;border:1px solid #ECEBE5;border-radius:12px;padding:14px 13px;margin-bottom:9px;}"+
+  ".nb-skeleton::after{content:'';position:absolute;inset:-20% auto -20% -55%;width:42%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.92),transparent);transform:skewX(-12deg);animation:nbScan 1.25s ease-in-out infinite;}"+
+  ".nb-sk-line,.nb-sk-pill{display:block;background:#E8E8E3;border-radius:999px;}"+
+  ".nb-sk-title{width:62%;height:13px;margin-bottom:10px;}.nb-sk-ref{width:38%;height:8px;margin-bottom:12px;background:#EEEEEA;}.nb-sk-meta{display:flex;align-items:center;gap:9px;}.nb-sk-pill{width:56px;height:16px;background:#EDEDE8;}.nb-sk-date{width:44px;height:8px;background:#EEEEEA;}"+
+  ".nb-skeleton:nth-child(2) .nb-sk-title{width:76%;}.nb-skeleton:nth-child(2) .nb-sk-ref{width:31%;}.nb-skeleton:nth-child(3) .nb-sk-title{width:51%;}.nb-skeleton:nth-child(3) .nb-sk-ref{width:44%;}"+
+  "@media(prefers-reduced-motion:reduce){.nb-skeleton::after{animation:none;display:none;}}"+
   "#nb-empty{padding:34px 22px;text-align:center;color:#9A9A93;font-size:13px;line-height:1.7;}"+
   "html.ar #nb-toggle,html.ar #nb-panel{font-family:\"Tajawal\",\"Cairo\",sans-serif;}";
   document.head.appendChild(css);
@@ -2124,7 +2133,19 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     panel.querySelector(".nb-x").addEventListener("click",close);
     backdrop.addEventListener("click",close);
     document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&panel.classList.contains("on")) close(); });
-    panel.querySelector("#nb-new").addEventListener("click",function(){ if(window.NORM_newBrief) window.NORM_newBrief(); });
+    panel.querySelector("#nb-new").addEventListener("click",function(){
+      var hasCurrent=!!window.NORM_BRIEFID||selected.size>0;
+      if(!hasCurrent){ try{ hasCurrent=Array.prototype.some.call(document.querySelectorAll('[id^="a-"], #m-submitter'),function(el){return !!String(el.value||"").trim();}); }catch(e){} }
+      close();
+      var startFresh=function(){ if(window.NORM_newBrief) window.NORM_newBrief(); };
+      if(hasCurrent&&typeof showConfirm==="function"){
+        showConfirm(tx("Create a new brief?","إنشاء بريف جديد؟"),
+                    tx("The current brief will be cleared so you can start fresh.","سيتم مسح البريف الحالي لتتمكّن من البدء من جديد."),
+                    tx("Create new brief","إنشاء بريف جديد"),
+                    tx("Cancel","إلغاء"),
+                    startFresh);
+      }else startFresh();
+    });
   }
   function relabel(){ if(!toggle) return; toggle.querySelector(".nb-lbl").textContent=tx("My briefs","بريفاتي"); panel.querySelector(".nb-title").textContent=tx("My briefs","بريفاتي"); panel.querySelector("#nb-new").textContent=tx("+ New brief","+ بريف جديد"); panel.setAttribute("dir",AR()?"rtl":"ltr"); toggle.setAttribute("dir",AR()?"rtl":"ltr"); }
   function open(){
@@ -2150,6 +2171,14 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     if(!items||!items.length){ var e=document.createElement("div"); e.id="nb-empty"; e.textContent=tx("No briefs yet. Start one and it'll appear here.","لا توجد بريفات بعد. ابدأ واحدًا وسيظهر هنا."); listEl.appendChild(e); return; }
     renderInto(listEl, items);
   }
+  function renderLoading(){
+    listEl.setAttribute("aria-busy","true");
+    listEl.setAttribute("aria-label",tx("Loading briefs","جارٍ تحميل البريفات"));
+    var cards="";
+    for(var i=0;i<3;i++) cards+='<div class="nb-skeleton" aria-hidden="true"><span class="nb-sk-line nb-sk-title"></span><span class="nb-sk-line nb-sk-ref"></span><div class="nb-sk-meta"><span class="nb-sk-pill"></span><span class="nb-sk-line nb-sk-date"></span></div></div>';
+    listEl.innerHTML=cards;
+  }
+  function loadingDone(){ listEl.removeAttribute("aria-busy"); listEl.removeAttribute("aria-label"); }
   function renderInto(container, items){
     items.forEach(function(it){
       var b=badge(it.status), el=document.createElement("div"); el.className="nb-item"; el.setAttribute("role","button");
@@ -2183,13 +2212,14 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   }
   function fetchList(){
     if(!window.NORM_SESSION){ render([]); return; }
-    listEl.innerHTML='<div id="nb-empty">'+tx("Loading…","جارٍ التحميل…")+'</div>';
+    renderLoading();
     aiFetch({crm:"list",token:window.NORM_SESSION}).then(function(r){
+      loadingDone();
       if(r&&r.ok===false){ renderError(r.error||""); return; }
       var items=(r&&r.items)||[];
       if(!items.length){ var lc=localCard(); if(lc){ render([lc]); return; } }
       render(items);
-    }).catch(function(){ renderError("network"); });
+    }).catch(function(){ loadingDone(); renderError("network"); });
   }
   function renderError(why){
     listEl.innerHTML="";
