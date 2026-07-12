@@ -4,7 +4,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="norm-build" content="2026.07.12.1" />
+<meta name="norm-build" content="2026.07.12.2" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script>window.NORM_BUILD="2026.07.12.1";</script>
+<script>window.NORM_BUILD="2026.07.12.2";</script>
 <style>
   :root{--bg:#ECECE8;--surface:#FCFCFA;--surface-2:#F6F6F2;--ink:#17181C;--muted:#74756F;--line:#DEDDD6;--line-strong:#CFCEC5;--accent:#d72120;--accent-soft:rgba(215,33,32,.07);--accent-soft-2:rgba(215,33,32,.13);--mot:#2563EB;--mot-soft:rgba(37,99,235,.10);--lit:#2563EB;--lit-soft:rgba(37,99,235,.10);--gold:#E0A93B;--prem:#12996A;--prem-soft:#E9F6EE;--prem-line:#B7E0C7;--prem-deep:#0E7A4F;--radius:14px;--radius-sm:10px;--display:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"Space Mono",ui-monospace,monospace;--shadow:0 1px 2px rgba(23,24,28,.04),0 8px 24px -16px rgba(23,24,28,.18);}
   html.ar{--display:"Tajawal",system-ui,sans-serif;--body:"Tajawal",system-ui,sans-serif;--mono:"Tajawal",system-ui,sans-serif;}
@@ -1538,7 +1538,7 @@ function buildHandoff(){
 function payload(){
   const today=new Date(); const date=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
   const printItems=[], choices={}, printList=[];
-  itemEls.forEach(r=>{ if(selected.has(r.id)&&r.pr&&!DIGITAL.has(r.en)){ printItems.push(r.en); choices[r.en]=fmtText(r.id); const arch=dieArch(r.en); const dieUrl=arch==="carton"?"https://www.templatemaker.nl/en/mailer/":arch==="bag"?"https://www.templatemaker.nl/en/bag/":arch==="cup"?"https://www.templatemaker.nl/en/cup/":"https://www.templatemaker.nl/"; printList.push({n:r[LANG], f:fmtText(r.id), key:r.en, s:specDeck(r), sz:dimsLabel(r), die:dieUrl}); } });
+  itemEls.forEach(r=>{ if(selected.has(r.id)&&r.pr&&!DIGITAL.has(r.en)){ printItems.push(r.en); choices[r.en]=fmtText(r.id); const arch=dieArch(r.en); const dieUrl=arch==="carton"?"https://www.templatemaker.nl/en/mailer/":arch==="bag"?"https://www.templatemaker.nl/en/bag/":arch==="cup"?"https://www.templatemaker.nl/en/cup/":"https://www.templatemaker.nl/"; printList.push({n:r[LANG], f:fmtText(r.id), key:r.en, s:specDeck(r), sz:dimsLabel(r), die:dieUrl, later:laterItems.has(r.id)}); } });
   return {LANG:LANG,SESSION:(window.NORM_SESSION||""),BRIEFID:(window.NORM_BRIEFID||""),SUBMITTER_ROLE:(window.NORM_ROLE||""),SUBMITTER:val("m-submitter"),SOURCE:sourceLabel(),TIER:tierLabel(),TIERCODE:tierCode(),STATUS:statusLabel(),CLIENT:val("a-name"),PROJECT_REF:"",DATE:date,PROFILE:profile?PROFILES.find(p=>p.key===profile).en:"",INDUSTRY:val("a-industry"),LOCATION:val("a-loc"),DOES:val("a-does"),AUDIENCE:val("a-audience"),USP:val("a-usp"),NAMEMEAN:val("a-namemean"),BRANDSTORY:val("a-about"),MVV:val("a-mvv"),PERSONALITY:val("a-personality"),TONE:val("a-tone"),COMPETITORS:val("a-comp"),MARKET:val("a-market"),LINKS:val("a-refs"),KEEP:val("a-keep"),AVOID:val("a-avoid"),SLOGAN:val("a-slogan"),NOTES:val("a-notes"),SCOPE:scopeLines().join("\n"),PREMCOUNT:(window.__premCount||0),PREMLIST:(window.__premNames||[]),EXTRACOUNT:(window.__extraCount||0),EXTRALIST:(window.__extraNames||[]),TOTALCOUNT:(window.__totalCount||0),printItems,choices,printList};
 }
 const WEBAPP_URL="https://script.google.com/macros/s/AKfycbwHB6kvclJyvWRQDxJdF9fOX-uLscgvk7wNNFP-7ucqO0Y6PkpMC82PqndzDd5tYLvnOg/exec";
@@ -1561,6 +1561,7 @@ async function buildFullPayload(){
   async function worker(){
     while(next<jobs.length){
       const it=jobs[next++],r=itemEls.find(x=>x.en===it.key); if(!r)continue;
+      if(it.later){it.thumb="";it.svg="";continue;}
       const f=selFmt(r);
       try{ it.thumb=await svgStrToPng(selfContainedMockSVG(TYPE[r.en]||"flat",[f.w,f.h]),540,423); }catch(e){ it.thumb=""; }
       it.svg=b64utf8(dieSVGFor(r));
@@ -1608,13 +1609,59 @@ function showDeckOverlay(state,msg,deckUrl){
     sub.textContent=msg||(ar?"تحقّق من رابط الخدمة وحاول مجددًا.":"Check the service link and try again."); }
   o.style.display="flex";
 }
-let _deckSending=false,_deckToken="",_deckProgressTimer=null,_deckProgressStarted=0;
+let _deckSending=false,_deckToken="",_deckProgressTimer=null,_deckProgressStarted=0,_deckPollTimer=null,_deckPollBusy=false,_deckSubmittedAt=0,_deckTimedOut=false;
 function deckProgressCopy(){
   return (typeof LANG!=="undefined"&&LANG==="ar")
     ? {steps:["نجهّز بيانات البريف…","نُنشئ معاينات المطبوعات…","نرسل البريف إلى نظام الإنشاء…","ننسخ قالب Google Slides…","نملأ بيانات العلامة ونطاق العمل…","نبني شرائح المطبوعات والقصّات…","نضع اللمسات الأخيرة ونحفظ العرض…"],long:"لا يزال العمل جاريًا — البريفات الكبيرة تحتاج وقتًا أطول. النظام يعمل، أبقِ الصفحة مفتوحة."}
     : {steps:["Preparing the brief data…","Creating the printable previews…","Sending the brief to the deck builder…","Copying the Google Slides template…","Filling the brand details and scope…","Building printable and die-cut slides…","Applying final touches and saving…"],long:"Still working — large briefs need more time. The builder is active, so keep this page open."};
 }
 function stopDeckProgress(){ if(_deckProgressTimer){clearInterval(_deckProgressTimer);_deckProgressTimer=null;} }
+function stopDeckStatusPoll(){ if(_deckPollTimer){clearInterval(_deckPollTimer);_deckPollTimer=null;} _deckPollBusy=false; }
+function deckLiveStage(stage){
+  const ar=(typeof LANG!=="undefined"&&LANG==="ar"),m=ar
+    ? {received:"استلم النظام البريف ويبدأ الإنشاء…",copying:"يتم الآن نسخ قالب Google Slides…",content:"يتم ملء بيانات العلامة…",printables:"يتم بناء شرائح المطبوعات والقصّات…",scope:"يتم تنسيق نطاق العمل…",finishing:"يتم الحفظ ووضع اللمسات الأخيرة…"}
+    : {received:"The builder received the brief…",copying:"Copying the Google Slides template…",content:"Filling the brand details…",printables:"Building printable and die-cut slides…",scope:"Formatting the scope slides…",finishing:"Saving and applying final touches…"};
+  return m[stage]||"";
+}
+function applyDeckLiveStatus(d){
+  const o=deckOverlay(),stage=o.querySelector(".dov-stage"),fill=o.querySelector(".dov-fill"),pc=o.querySelector(".dov-pct"),step=o.querySelector(".dov-step"),p=Math.max(3,Math.min(99,Number(d.progress||0)));
+  const copy=deckLiveStage(d.stage); if(stage&&copy)stage.textContent=copy;
+  if(fill)fill.style.width=p+"%"; if(pc)pc.textContent=Math.round(p)+"%"; if(step)step.textContent=(typeof LANG!=="undefined"&&LANG==="ar")?"حالة مباشرة":"LIVE STATUS";
+}
+function recoverBuiltDeck(){
+  if(!window.NORM_SESSION||!window.NORM_BRIEFID)return Promise.resolve("");
+  return aiFetch({crm:"list",token:window.NORM_SESSION}).then(function(r){
+    const it=((r&&r.items)||[]).find(function(x){return x.id===window.NORM_BRIEFID&&x.deck;}); return it?it.deck:"";
+  }).catch(function(){return "";});
+}
+function finishDeckResult(d){
+  if(!_deckToken)return; resetDeckSending();
+  if(d.ok&&/^https:\/\/docs\.google\.com\/presentation\/d\//.test(d.url||"")){
+    const note=(typeof LANG!=="undefined"&&LANG==="ar")?"اكتمل إنشاء العرض. اختر فتح العرض أو العودة للتعديل أو بدء بريف جديد.":"Your deck is complete. Open it, go back to edit, or start a new brief.";
+    showDeckOverlay("success",note,d.url); try{if(window.NORM_refreshBriefs)window.NORM_refreshBriefs();}catch(e){}
+  }else showDeckOverlay("error",d.message||"");
+}
+function startDeckStatusPoll(){
+  stopDeckStatusPoll(); _deckSubmittedAt=Date.now(); _deckTimedOut=false;
+  async function poll(){
+    if(_deckPollBusy||!_deckToken)return; _deckPollBusy=true; const token=_deckToken;
+    try{
+      const d=await aiFetch({deckstatus:token}); if(token!==_deckToken)return;
+      if(d&&d.found){
+        if(d.state==="done"&&d.url){ finishDeckResult({ok:true,url:d.url}); return; }
+        if(d.state==="error"){ finishDeckResult({ok:false,message:d.message||""}); return; }
+        applyDeckLiveStatus(d);
+      }
+      if(!_deckTimedOut&&Date.now()-_deckSubmittedAt>390000){
+        _deckTimedOut=true; const url=await recoverBuiltDeck(); if(token!==_deckToken)return;
+        if(url){ finishDeckResult({ok:true,url:url}); return; }
+        const ar=(typeof LANG!=="undefined"&&LANG==="ar");
+        finishDeckResult({ok:false,message:ar?"توقّف الإنشاء لأن Apps Script تجاوز حد التنفيذ البالغ ست دقائق. البريف محفوظ ولم تعد هناك عملية تعمل. أغلق الرسالة وحاول مرة أخرى؛ تم تفعيل الوضع السريع لتقليل مدة الإنشاء.":"The build stopped because Apps Script exceeded its six-minute execution limit. Your brief is saved and no process is still running. Close this message and try again; Fast mode is now enabled to reduce build time."});
+      }
+    }catch(e){} finally{_deckPollBusy=false;}
+  }
+  setTimeout(poll,1800); _deckPollTimer=setInterval(poll,4500);
+}
 function startDeckProgress(){
   stopDeckProgress(); _deckProgressStarted=Date.now(); const o=deckOverlay(),copy=deckProgressCopy(),marks=[0,4,14,34,62,98,138];
   function update(){
@@ -1626,18 +1673,11 @@ function startDeckProgress(){
   }
   update(); _deckProgressTimer=setInterval(update,650);
 }
-function resetDeckSending(){ _deckSending=false; _deckToken=""; stopDeckProgress(); const b=document.getElementById("make-deck"); if(b)b.disabled=false; }
+function resetDeckSending(){ _deckSending=false; _deckToken=""; stopDeckProgress(); stopDeckStatusPoll(); const b=document.getElementById("make-deck"); if(b)b.disabled=false; }
 window.addEventListener("message",function(ev){
   const d=ev.data||{};
   if(d.type!=="norm-deck-result"||!_deckToken||d.token!==_deckToken)return;
-  resetDeckSending();
-  if(d.ok&&/^https:\/\/docs\.google\.com\/presentation\/d\//.test(d.url||"")){
-    // Stay in the app so the user sees the completion state and chooses what
-    // happens next. Slides opens only from the explicit Open deck button.
-    const note=(typeof LANG!=="undefined"&&LANG==="ar")?"اكتمل إنشاء العرض. اختر فتح العرض أو العودة للتعديل أو بدء بريف جديد.":"Your deck is complete. Open it, go back to edit, or start a new brief.";
-    showDeckOverlay("success",note,d.url);
-    try{if(window.NORM_refreshBriefs)window.NORM_refreshBriefs();}catch(e){}
-  }else showDeckOverlay("error",d.message||"");
+  finishDeckResult(d);
 });
 document.getElementById("make-deck").addEventListener("click",async ()=>{
   if(_deckSending) return;
@@ -1651,7 +1691,7 @@ document.getElementById("make-deck").addEventListener("click",async ()=>{
   showDeckOverlay("loading");
   let data; try{ data=await buildFullPayload(); }catch(e){ data=payload(); }
   data.CALLBACK_TOKEN=_deckToken;
-  try{ const f=document.getElementById("deck-form"); f.action=url; f.target="norm_deck_bridge"; document.getElementById("deck-payload").value=JSON.stringify(data); f.submit(); }
+  try{ const f=document.getElementById("deck-form"); f.action=url; f.target="norm_deck_bridge"; document.getElementById("deck-payload").value=JSON.stringify(data); f.submit(); startDeckStatusPoll(); }
   catch(err){ if(foot)foot.textContent=t("nourl"); showDeckOverlay("error",t("nourl")); resetDeckSending(); }
 });
 document.getElementById("copy-brief").addEventListener("click",e=>{ navigator.clipboard&&navigator.clipboard.writeText(document.getElementById("briefbox").textContent); const sp=e.currentTarget.querySelector("span"); const o=sp.textContent; sp.textContent=t("copied"); setTimeout(()=>sp.textContent=o,1600); });
