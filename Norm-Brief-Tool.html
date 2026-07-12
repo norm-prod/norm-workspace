@@ -638,8 +638,7 @@
   <button class="btn cobalt" id="fwd-btn" type="button"><span id="fwd-label" data-i18n="next">Next — preview mockups</span><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
 </div></div>
 <div class="lightbox" id="lightbox"><div class="lb-card"><button class="lb-close" id="lb-close" type="button" data-i18n="close">Close</button><h4 id="lb-title"></h4><div class="size" id="lb-size"></div><div class="lb-svg" id="lb-svg"></div></div></div>
-<form id="deck-form" method="POST" target="norm_deck_bridge" style="display:none"><input type="hidden" name="payload" id="deck-payload"></form>
-<iframe id="deck-bridge" name="norm_deck_bridge" title="" aria-hidden="true" style="display:none"></iframe>
+<form id="deck-form" method="POST" target="norm_deck" style="display:none"><input type="hidden" name="payload" id="deck-payload"></form>
 <datalist id="stocklist"><option value="350gsm Art"></option><option value="300gsm Art"></option><option value="400gsm Art"></option><option value="300gsm Uncoated"></option><option value="120gsm Uncoated"></option><option value="170gsm Silk"></option><option value="250gsm Kraft"></option><option value="600gsm Duplex"></option></datalist>
 <button id="devfill" type="button">⚙ Dev: fill &amp; select all</button>
 <div class="cmodal" id="cmodal"><div class="cmbox"><h3 id="cm-title"></h3><p id="cm-msg"></p><div class="cmbtns"><button type="button" id="cm-no"></button><button type="button" class="prim" id="cm-yes"></button></div></div></div>
@@ -1106,7 +1105,7 @@ DATA.forEach((cat,ci)=>{
 function toggle(id){ const r=itemEls.find(x=>x.id===id); if(selected.has(id)){selected.delete(id);r.el.classList.remove("sel");r.el.setAttribute("aria-checked","false");}else{selected.add(id);r.el.classList.add("sel");r.el.setAttribute("aria-checked","true");} refresh(); }
 function selectAll(ci){ const c=catRefs[ci], on=c.ids.every(id=>selected.has(id)); c.ids.forEach(id=>{const r=itemEls.find(x=>x.id===id); if(on){selected.delete(id);r.el.classList.remove("sel");r.el.setAttribute("aria-checked","false");}else{selected.add(id);r.el.classList.add("sel");r.el.setAttribute("aria-checked","true");}}); refresh(); }
 function removeItem(id){ const r=itemEls.find(x=>x.id===id); selected.delete(id); delete vsel[id]; delete dims[id]; laterItems.delete(id); r.el.classList.remove("sel"); r.el.setAttribute("aria-checked","false"); buildMockups(); refresh(); }
-function clearAll(){ selected.clear(); recd.clear(); for(const k in vsel)delete vsel[k]; for(const k in dims)delete dims[k]; for(const k in spec)delete spec[k]; laterItems.clear(); itemEls.forEach(r=>{r.el.classList.remove("sel","recd");r.el.setAttribute("aria-checked","false");}); refresh(); }
+function clearAll(){ selected.clear(); for(const k in vsel)delete vsel[k]; for(const k in dims)delete dims[k]; laterItems.clear(); itemEls.forEach(r=>{r.el.classList.remove("sel");r.el.setAttribute("aria-checked","false");}); refresh(); }
 function refresh(){
   catRefs.forEach(c=>{ const n=c.ids.filter(id=>selected.has(id)).length; c.badgeEl.textContent=n+"/"+c.total; c.badgeEl.classList.toggle("has",n>0); c.navCountEl.textContent=n; c.navEl.classList.toggle("has",n>0); c.selallEl.textContent=(n===c.total&&c.total>0)?t("clearsec"):t("selall"); });
   document.getElementById("tc-sel").textContent=selected.size; document.getElementById("tc-tot").textContent=itemEls.length;
@@ -1558,30 +1557,23 @@ function deckOverlay(){
   let o=document.getElementById("deck-ov"); if(o) return o;
   o=document.createElement("div"); o.id="deck-ov";
   o.style.cssText="position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(20,21,25,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);";
-  o.innerHTML='<style>@keyframes dovspin{to{transform:rotate(360deg)}}.dov-actions{display:none;grid-template-columns:1fr;gap:9px;margin-top:24px}.dov-btn{width:100%;border:1px solid var(--line-strong,#ddd);background:var(--surface,#fff);color:var(--ink,#17181C);font:inherit;font-size:13px;font-weight:600;padding:10px 15px;border-radius:10px;cursor:pointer}.dov-btn:hover{background:var(--surface-2,#f4f4f0)}.dov-open{background:var(--accent,#d72120);border-color:var(--accent,#d72120);color:#fff}.dov-open:hover{background:#bd1d1c}</style><div class="deck-ov-card" style="background:var(--surface,#fff);color:var(--ink,#17181C);max-width:400px;width:calc(100% - 48px);border-radius:18px;padding:34px 30px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);"><div class="dov-ring" style="width:48px;height:48px;border-radius:50%;border:3px solid var(--line-strong,#ddd);border-top-color:var(--accent,#d72120);margin:0 auto 22px;animation:dovspin .85s linear infinite;"></div><div class="dov-check" style="display:none;width:56px;height:56px;border-radius:50%;margin:0 auto 22px;background:#E5F5EC;color:#168454;align-items:center;justify-content:center;font-size:30px;font-weight:700;">✓</div><div class="dov-title" style="font-weight:600;font-size:18px;letter-spacing:-.01em;margin-bottom:9px;"></div><div class="dov-sub" style="font-size:13.5px;line-height:1.55;color:var(--muted,#74756F);"></div><div class="dov-actions"><button class="dov-btn dov-open" type="button"></button><button class="dov-btn dov-edit" type="button"></button><button class="dov-btn dov-new" type="button"></button></div><button class="dov-close" type="button" style="display:none;margin-top:20px;border:1px solid var(--line-strong,#ddd);background:var(--surface,#fff);color:var(--ink,#17181C);font:inherit;font-size:13px;padding:9px 18px;border-radius:9px;cursor:pointer;"></button></div>';
+  o.innerHTML='<style>@keyframes dovspin{to{transform:rotate(360deg)}}</style><div class="deck-ov-card" style="background:var(--surface,#fff);color:var(--ink,#17181C);max-width:380px;width:calc(100% - 48px);border-radius:18px;padding:34px 30px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);"><div class="dov-ring" style="width:48px;height:48px;border-radius:50%;border:3px solid var(--line-strong,#ddd);border-top-color:var(--accent,#d72120);margin:0 auto 22px;animation:dovspin .85s linear infinite;"></div><div class="dov-title" style="font-weight:600;font-size:18px;letter-spacing:-.01em;margin-bottom:9px;"></div><div class="dov-sub" style="font-size:13.5px;line-height:1.55;color:var(--muted,#74756F);"></div><button class="dov-close" type="button" style="display:none;margin-top:20px;border:1px solid var(--line-strong,#ddd);background:var(--surface,#fff);color:var(--ink,#17181C);font:inherit;font-size:13px;padding:9px 18px;border-radius:9px;cursor:pointer;"></button></div>';
   document.body.appendChild(o);
+  o.addEventListener("click",function(e){ if(e.target===o) o.style.display="none"; });
   o.querySelector(".dov-close").addEventListener("click",function(){ o.style.display="none"; });
-  o.querySelector(".dov-open").addEventListener("click",function(){ if(o._deckUrl) window.open(o._deckUrl,"_blank"); });
-  o.querySelector(".dov-edit").addEventListener("click",function(){ o.style.display="none"; try{ setStep("brief"); window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} });
-  o.querySelector(".dov-new").addEventListener("click",function(){ o.style.display="none"; try{ if(window.NORM_newBrief) window.NORM_newBrief(); }catch(e){} });
   return o;
 }
-function showDeckOverlay(state,msg,deckUrl){
+function showDeckOverlay(state,msg){
   const ar=(typeof LANG!=="undefined"&&LANG==="ar"); const o=deckOverlay();
-  const ring=o.querySelector(".dov-ring"),check=o.querySelector(".dov-check"),title=o.querySelector(".dov-title"),sub=o.querySelector(".dov-sub"),close=o.querySelector(".dov-close"),actions=o.querySelector(".dov-actions");
+  const ring=o.querySelector(".dov-ring"),title=o.querySelector(".dov-title"),sub=o.querySelector(".dov-sub"),close=o.querySelector(".dov-close");
   o.querySelector(".deck-ov-card").setAttribute("dir",ar?"rtl":"ltr");
-  o._deckUrl=deckUrl||"";
   close.textContent=ar?"إغلاق":"Close";
-  ring.style.display="none"; check.style.display="none"; actions.style.display="none"; close.style.display="none";
-  if(state==="loading"){ ring.style.display="";
+  if(state==="loading"){ ring.style.display=""; close.style.display="none";
     title.textContent=ar?"جارٍ إنشاء العرض":"Building your deck";
-    sub.textContent=ar?"نُجهّز عرض Google Slides الخاص بك. أبقِ هذه الصفحة مفتوحة حتى يكتمل.":"Preparing your Google Slides deck. Keep this page open until it is complete."; }
-  else if(state==="success"){ check.style.display="flex"; actions.style.display="grid";
-    title.textContent=ar?"العرض جاهز":"Deck ready";
-    sub.textContent=msg||(ar?"اكتمل إنشاء العرض وتم فتحه في تبويب جديد.":"Your deck is complete and has been opened in a new tab.");
-    o.querySelector(".dov-open").textContent=ar?"افتح العرض":"Open deck";
-    o.querySelector(".dov-edit").textContent=ar?"العودة والتعديل":"Go back and edit";
-    o.querySelector(".dov-new").textContent=ar?"إنشاء بريف جديد":"Create a new brief"; }
+    sub.textContent=ar?"نُجهّز عرض Google Slides الخاص بك. قد يستغرق ذلك دقيقة، وسيُفتح في تبويب جديد.":"Preparing your Google Slides deck. This can take a minute, and it opens in a new tab."; }
+  else if(state==="sent"){ ring.style.display=""; close.style.display="inline-block";
+    title.textContent=ar?"تم الإرسال":"Sent to Google Slides";
+    sub.textContent=ar?"يتم إنشاء عرضك الآن، وسيُفتح في التبويب الجديد عند جهوزه.":"Your deck is generating now and will open in the new tab when it’s ready."; }
   else if(state==="popup"){ ring.style.display="none"; close.style.display="inline-block";
     title.textContent=ar?"منع المتصفّح فتح التبويب":"Your browser blocked the tab";
     sub.textContent=ar?"اسمح بالنوافذ المنبثقة لهذا الموقع ثم اضغط «إنشاء العرض» مرة أخرى.":"Allow pop-ups for this site, then click Create again."; }
@@ -1590,19 +1582,7 @@ function showDeckOverlay(state,msg,deckUrl){
     sub.textContent=msg||(ar?"تحقّق من رابط الخدمة وحاول مجددًا.":"Check the service link and try again."); }
   o.style.display="flex";
 }
-let _deckSending=false,_deckWatchdog=null,_deckToken="";
-function resetDeckSending(){ _deckSending=false; _deckToken=""; const b=document.getElementById("make-deck"); if(b)b.disabled=false; if(_deckWatchdog){clearTimeout(_deckWatchdog);_deckWatchdog=null;} }
-window.addEventListener("message",function(ev){
-  const d=ev.data||{};
-  if(d.type!=="norm-deck-result"||!_deckToken||d.token!==_deckToken)return;
-  resetDeckSending();
-  if(d.ok&&/^https:\/\/docs\.google\.com\/presentation\/d\//.test(d.url||"")){
-    let opened=null; try{opened=window.open(d.url,"_blank"); if(opened)opened.opener=null;}catch(e){}
-    const note=(typeof LANG!=="undefined"&&LANG==="ar")?(opened?"اكتمل إنشاء العرض وتم فتحه في تبويب جديد.":"اكتمل إنشاء العرض. اضغط «افتح العرض» للانتقال إليه."):(opened?"Your deck is complete and has been opened in a new tab.":"Your deck is complete. Use Open deck to view it.");
-    showDeckOverlay("success",note,d.url);
-    try{if(window.NORM_refreshBriefs)window.NORM_refreshBriefs();}catch(e){}
-  }else showDeckOverlay("error",d.message||"");
-});
+let _deckSending=false;
 document.getElementById("make-deck").addEventListener("click",async ()=>{
   if(_deckSending) return;
   if(!validateBrief()){ setStep("brief"); return; }
@@ -1610,13 +1590,13 @@ document.getElementById("make-deck").addEventListener("click",async ()=>{
   if(!url){ if(foot)foot.textContent=t("nourl"); showDeckOverlay("error",t("nourl")); return; }
   if(foot)foot.textContent=t("creating");
   _deckSending=true; var _mk=document.getElementById("make-deck"); if(_mk) _mk.disabled=true;
-  _deckToken=Date.now().toString(36)+"_"+Math.random().toString(36).slice(2);
-  showDeckOverlay("loading");
-  _deckWatchdog=setTimeout(function(){ resetDeckSending(); showDeckOverlay("error",(typeof LANG!=="undefined"&&LANG==="ar")?"استغرق إنشاء العرض وقتًا أطول من المتوقع. تحقّق من اتصالك وحاول مجددًا.":"The deck is taking longer than expected. Check your connection and try again."); },180000);
+  var _resetSend=function(){ _deckSending=false; if(_mk) _mk.disabled=false; };
+  setTimeout(_resetSend,8000);
+  const win=window.open("about:blank","norm_deck");
+  if(win){ try{ win.document.open(); win.document.write(loadingHTML()); win.document.close(); }catch(e){} }
   let data; try{ data=await buildFullPayload(); }catch(e){ data=payload(); }
-  data.CALLBACK_TOKEN=_deckToken;
-  try{ const f=document.getElementById("deck-form"); f.action=url; f.target="norm_deck_bridge"; document.getElementById("deck-payload").value=JSON.stringify(data); f.submit(); }
-  catch(err){ if(foot)foot.textContent=t("nourl"); showDeckOverlay("error",t("nourl")); resetDeckSending(); }
+  try{ const f=document.getElementById("deck-form"); f.action=url; f.target="norm_deck"; document.getElementById("deck-payload").value=JSON.stringify(data); f.submit(); if(!win) showDeckOverlay("popup"); }
+  catch(err){ if(win){try{win.close();}catch(e){}} if(foot)foot.textContent=t("nourl"); showDeckOverlay("error",t("nourl")); _resetSend(); }
 });
 document.getElementById("copy-brief").addEventListener("click",e=>{ navigator.clipboard&&navigator.clipboard.writeText(document.getElementById("briefbox").textContent); const sp=e.currentTarget.querySelector("span"); const o=sp.textContent; sp.textContent=t("copied"); setTimeout(()=>sp.textContent=o,1600); });
 const briefmodal=document.getElementById("briefmodal");
@@ -1829,16 +1809,14 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
       window.NORM_clearDraft();
       var oldId=window.NORM_BRIEFID; window.NORM_BRIEFID="";
       // delete the server draft too, so it can't come back on any device
-      var deletion=null;
-      try{ if(window.NORM_SESSION && oldId) deletion=aiFetch({crm:"deletedraft",token:window.NORM_SESSION,id:oldId}); }catch(e){}
+      try{ if(window.NORM_SESSION && oldId) aiFetch({crm:"deletedraft",token:window.NORM_SESSION,id:oldId}).catch(function(){}); }catch(e){}
       wipeFields();
-      var refreshAfterDelete=function(){ try{ if(window.NORM_refreshBriefs) window.NORM_refreshBriefs(); }catch(e){} };
-      if(deletion&&typeof deletion.then==="function") deletion.then(refreshAfterDelete,refreshAfterDelete); else refreshAfterDelete();
+      if(window.NORM_refreshBriefs) window.NORM_refreshBriefs();
       bypassUnload=false; setTimeout(function(){ window.__ngNoRestore=false; },1500);
     };
     doReset();
   };
-  window.NORM_newBrief=function(){ window.NORM_resetAll(); try{ reached=0; setStep("brief"); window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} };
+  window.NORM_newBrief=function(){ window.NORM_resetAll(); try{ window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} };
   function toast(msg){
     var ar=(LANG==="ar"); var d=document.createElement("div");
     d.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:9998;display:flex;align-items:center;gap:13px;background:var(--ink,#17181C);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;box-shadow:0 18px 50px -16px rgba(0,0,0,.5);max-width:calc(100% - 32px);";
@@ -2094,7 +2072,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   "#nb-panel{position:fixed;top:0;bottom:0;z-index:9995;width:min(340px,86vw);background:#FBFBF9;box-shadow:0 0 60px -10px rgba(0,0,0,.4);display:flex;flex-direction:column;transition:transform .34s cubic-bezier(.4,0,.2,1);font-family:var(--display),system-ui,sans-serif;}"+
   "html:not(.ar) #nb-panel{left:0;transform:translateX(-102%);border-right:1px solid #E4E3DC;}"+
   "html.ar #nb-panel{right:0;transform:translateX(102%);border-left:1px solid #E4E3DC;}"+
-  "html:not(.ar) #nb-panel.on,html.ar #nb-panel.on{transform:translateX(0)!important;visibility:visible!important;opacity:1!important;}"+
+  "#nb-panel.on{transform:none;}"+
   "#nb-head{padding:20px 20px 15px;border-bottom:1px solid #EDECE6;}"+
   "#nb-head .nb-t{font-size:17px;font-weight:700;color:#17181C;display:flex;align-items:center;justify-content:space-between;gap:10px;}"+
   "#nb-head .nb-x{background:transparent;border:0;font-size:22px;color:#9A9A93;cursor:pointer;line-height:1;padding:0;}#nb-head .nb-x:hover{color:#17181C;}"+
@@ -2107,13 +2085,6 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   "#nb-list .nb-meta{margin-top:7px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:#9A9A93;flex-wrap:wrap;}"+
   "#nb-list .nb-badge{font-size:10.5px;font-weight:700;padding:2px 9px;border-radius:999px;letter-spacing:.02em;}"+
   ".nb-b-draft{background:#F0EFEA;color:#8A8A82;}.nb-b-built{background:#E4F5EC;color:#1B8A5A;}.nb-b-prog{background:#E8EEFD;color:#3B5BC0;}.nb-b-deliv{background:#FBF1DC;color:#9A7B1E;}"+
-  "@keyframes nbScan{0%{transform:translateX(-140%)}100%{transform:translateX(240%)}}"+
-  ".nb-skeleton{position:relative;overflow:hidden;background:#fff;border:1px solid #ECEBE5;border-radius:12px;padding:14px 13px;margin-bottom:9px;}"+
-  ".nb-skeleton::after{content:'';position:absolute;inset:-20% auto -20% -55%;width:42%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.92),transparent);transform:skewX(-12deg);animation:nbScan 1.25s ease-in-out infinite;}"+
-  ".nb-sk-line,.nb-sk-pill{display:block;background:#E8E8E3;border-radius:999px;}"+
-  ".nb-sk-title{width:62%;height:13px;margin-bottom:10px;}.nb-sk-ref{width:38%;height:8px;margin-bottom:12px;background:#EEEEEA;}.nb-sk-meta{display:flex;align-items:center;gap:9px;}.nb-sk-pill{width:56px;height:16px;background:#EDEDE8;}.nb-sk-date{width:44px;height:8px;background:#EEEEEA;}"+
-  ".nb-skeleton:nth-child(2) .nb-sk-title{width:76%;}.nb-skeleton:nth-child(2) .nb-sk-ref{width:31%;}.nb-skeleton:nth-child(3) .nb-sk-title{width:51%;}.nb-skeleton:nth-child(3) .nb-sk-ref{width:44%;}"+
-  "@media(prefers-reduced-motion:reduce){.nb-skeleton::after{animation:none;display:none;}}"+
   "#nb-empty{padding:34px 22px;text-align:center;color:#9A9A93;font-size:13px;line-height:1.7;}"+
   "html.ar #nb-toggle,html.ar #nb-panel{font-family:\"Tajawal\",\"Cairo\",sans-serif;}";
   document.head.appendChild(css);
@@ -2133,37 +2104,11 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     panel.querySelector(".nb-x").addEventListener("click",close);
     backdrop.addEventListener("click",close);
     document.addEventListener("keydown",function(e){ if(e.key==="Escape"&&panel.classList.contains("on")) close(); });
-    panel.querySelector("#nb-new").addEventListener("click",function(){
-      var hasCurrent=!!window.NORM_BRIEFID||selected.size>0;
-      if(!hasCurrent){ try{ hasCurrent=Array.prototype.some.call(document.querySelectorAll('[id^="a-"], #m-submitter'),function(el){return !!String(el.value||"").trim();}); }catch(e){} }
-      close();
-      var startFresh=function(){ if(window.NORM_newBrief) window.NORM_newBrief(); };
-      if(hasCurrent&&typeof showConfirm==="function"){
-        showConfirm(tx("Create a new brief?","إنشاء بريف جديد؟"),
-                    tx("The current brief will be cleared so you can start fresh.","سيتم مسح البريف الحالي لتتمكّن من البدء من جديد."),
-                    tx("Create new brief","إنشاء بريف جديد"),
-                    tx("Cancel","إلغاء"),
-                    startFresh);
-      }else startFresh();
-    });
+    panel.querySelector("#nb-new").addEventListener("click",function(){ if(window.NORM_newBrief) window.NORM_newBrief(); });
   }
   function relabel(){ if(!toggle) return; toggle.querySelector(".nb-lbl").textContent=tx("My briefs","بريفاتي"); panel.querySelector(".nb-title").textContent=tx("My briefs","بريفاتي"); panel.querySelector("#nb-new").textContent=tx("+ New brief","+ بريف جديد"); panel.setAttribute("dir",AR()?"rtl":"ltr"); toggle.setAttribute("dir",AR()?"rtl":"ltr"); }
-  function open(){
-    panel.classList.add("on");
-    panel.style.display="flex";
-    panel.style.visibility="visible";
-    panel.style.opacity="1";
-    panel.style.transform="translateX(0)";
-    panel.style.zIndex="10001";
-    backdrop.style.zIndex="10000";
-    backdrop.classList.add("on");
-    fetchList();
-  }
-  function close(){
-    panel.classList.remove("on");
-    panel.style.transform=AR()?"translateX(102%)":"translateX(-102%)";
-    backdrop.classList.remove("on");
-  }
+  function open(){ panel.classList.add("on"); backdrop.classList.add("on"); fetchList(); }
+  function close(){ panel.classList.remove("on"); backdrop.classList.remove("on"); }
   function rel(ts){ if(!ts) return ""; var d=Date.now()-ts, m=60000, h=3600000, day=86400000; if(d<h) return tx(Math.max(1,Math.round(d/m))+"m ago","منذ "+Math.max(1,Math.round(d/m))+" د"); if(d<day) return tx(Math.round(d/h)+"h ago","منذ "+Math.round(d/h)+" س"); if(d<day*7) return tx(Math.round(d/day)+"d ago","منذ "+Math.round(d/day)+" ي"); return new Date(ts).toLocaleDateString(); }
   function badge(st){ var map={"Draft":["nb-b-draft",tx("Draft","مسودة")],"Deck Built":["nb-b-built",tx("Deck built","تم الإنشاء")],"Submitted":["nb-b-built",tx("Submitted","مُرسل")],"In Progress":["nb-b-prog",tx("In progress","قيد التنفيذ")],"Delivered":["nb-b-deliv",tx("Delivered","تم التسليم")]}; return map[st]||["nb-b-draft",st||""]; }
   function render(items){
@@ -2171,14 +2116,6 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     if(!items||!items.length){ var e=document.createElement("div"); e.id="nb-empty"; e.textContent=tx("No briefs yet. Start one and it'll appear here.","لا توجد بريفات بعد. ابدأ واحدًا وسيظهر هنا."); listEl.appendChild(e); return; }
     renderInto(listEl, items);
   }
-  function renderLoading(){
-    listEl.setAttribute("aria-busy","true");
-    listEl.setAttribute("aria-label",tx("Loading briefs","جارٍ تحميل البريفات"));
-    var cards="";
-    for(var i=0;i<3;i++) cards+='<div class="nb-skeleton" aria-hidden="true"><span class="nb-sk-line nb-sk-title"></span><span class="nb-sk-line nb-sk-ref"></span><div class="nb-sk-meta"><span class="nb-sk-pill"></span><span class="nb-sk-line nb-sk-date"></span></div></div>';
-    listEl.innerHTML=cards;
-  }
-  function loadingDone(){ listEl.removeAttribute("aria-busy"); listEl.removeAttribute("aria-label"); }
   function renderInto(container, items){
     items.forEach(function(it){
       var b=badge(it.status), el=document.createElement("div"); el.className="nb-item"; el.setAttribute("role","button");
@@ -2212,14 +2149,13 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   }
   function fetchList(){
     if(!window.NORM_SESSION){ render([]); return; }
-    renderLoading();
+    listEl.innerHTML='<div id="nb-empty">'+tx("Loading…","جارٍ التحميل…")+'</div>';
     aiFetch({crm:"list",token:window.NORM_SESSION}).then(function(r){
-      loadingDone();
       if(r&&r.ok===false){ renderError(r.error||""); return; }
       var items=(r&&r.items)||[];
       if(!items.length){ var lc=localCard(); if(lc){ render([lc]); return; } }
       render(items);
-    }).catch(function(){ loadingDone(); renderError("network"); });
+    }).catch(function(){ renderError("network"); });
   }
   function renderError(why){
     listEl.innerHTML="";
