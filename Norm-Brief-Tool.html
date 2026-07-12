@@ -638,7 +638,8 @@
   <button class="btn cobalt" id="fwd-btn" type="button"><span id="fwd-label" data-i18n="next">Next — preview mockups</span><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
 </div></div>
 <div class="lightbox" id="lightbox"><div class="lb-card"><button class="lb-close" id="lb-close" type="button" data-i18n="close">Close</button><h4 id="lb-title"></h4><div class="size" id="lb-size"></div><div class="lb-svg" id="lb-svg"></div></div></div>
-<form id="deck-form" method="POST" target="norm_deck" style="display:none"><input type="hidden" name="payload" id="deck-payload"></form>
+<form id="deck-form" method="POST" target="norm_deck_bridge" style="display:none"><input type="hidden" name="payload" id="deck-payload"></form>
+<iframe id="deck-bridge" name="norm_deck_bridge" title="" aria-hidden="true" style="display:none"></iframe>
 <datalist id="stocklist"><option value="350gsm Art"></option><option value="300gsm Art"></option><option value="400gsm Art"></option><option value="300gsm Uncoated"></option><option value="120gsm Uncoated"></option><option value="170gsm Silk"></option><option value="250gsm Kraft"></option><option value="600gsm Duplex"></option></datalist>
 <button id="devfill" type="button">⚙ Dev: fill &amp; select all</button>
 <div class="cmodal" id="cmodal"><div class="cmbox"><h3 id="cm-title"></h3><p id="cm-msg"></p><div class="cmbtns"><button type="button" id="cm-no"></button><button type="button" class="prim" id="cm-yes"></button></div></div></div>
@@ -1557,23 +1558,30 @@ function deckOverlay(){
   let o=document.getElementById("deck-ov"); if(o) return o;
   o=document.createElement("div"); o.id="deck-ov";
   o.style.cssText="position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(20,21,25,.62);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);";
-  o.innerHTML='<style>@keyframes dovspin{to{transform:rotate(360deg)}}</style><div class="deck-ov-card" style="background:var(--surface,#fff);color:var(--ink,#17181C);max-width:380px;width:calc(100% - 48px);border-radius:18px;padding:34px 30px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);"><div class="dov-ring" style="width:48px;height:48px;border-radius:50%;border:3px solid var(--line-strong,#ddd);border-top-color:var(--accent,#d72120);margin:0 auto 22px;animation:dovspin .85s linear infinite;"></div><div class="dov-title" style="font-weight:600;font-size:18px;letter-spacing:-.01em;margin-bottom:9px;"></div><div class="dov-sub" style="font-size:13.5px;line-height:1.55;color:var(--muted,#74756F);"></div><button class="dov-close" type="button" style="display:none;margin-top:20px;border:1px solid var(--line-strong,#ddd);background:var(--surface,#fff);color:var(--ink,#17181C);font:inherit;font-size:13px;padding:9px 18px;border-radius:9px;cursor:pointer;"></button></div>';
+  o.innerHTML='<style>@keyframes dovspin{to{transform:rotate(360deg)}}.dov-actions{display:none;grid-template-columns:1fr;gap:9px;margin-top:24px}.dov-btn{width:100%;border:1px solid var(--line-strong,#ddd);background:var(--surface,#fff);color:var(--ink,#17181C);font:inherit;font-size:13px;font-weight:600;padding:10px 15px;border-radius:10px;cursor:pointer}.dov-btn:hover{background:var(--surface-2,#f4f4f0)}.dov-open{background:var(--accent,#d72120);border-color:var(--accent,#d72120);color:#fff}.dov-open:hover{background:#bd1d1c}</style><div class="deck-ov-card" style="background:var(--surface,#fff);color:var(--ink,#17181C);max-width:400px;width:calc(100% - 48px);border-radius:18px;padding:34px 30px;text-align:center;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);"><div class="dov-ring" style="width:48px;height:48px;border-radius:50%;border:3px solid var(--line-strong,#ddd);border-top-color:var(--accent,#d72120);margin:0 auto 22px;animation:dovspin .85s linear infinite;"></div><div class="dov-check" style="display:none;width:56px;height:56px;border-radius:50%;margin:0 auto 22px;background:#E5F5EC;color:#168454;align-items:center;justify-content:center;font-size:30px;font-weight:700;">✓</div><div class="dov-title" style="font-weight:600;font-size:18px;letter-spacing:-.01em;margin-bottom:9px;"></div><div class="dov-sub" style="font-size:13.5px;line-height:1.55;color:var(--muted,#74756F);"></div><div class="dov-actions"><button class="dov-btn dov-open" type="button"></button><button class="dov-btn dov-edit" type="button"></button><button class="dov-btn dov-new" type="button"></button></div><button class="dov-close" type="button" style="display:none;margin-top:20px;border:1px solid var(--line-strong,#ddd);background:var(--surface,#fff);color:var(--ink,#17181C);font:inherit;font-size:13px;padding:9px 18px;border-radius:9px;cursor:pointer;"></button></div>';
   document.body.appendChild(o);
-  o.addEventListener("click",function(e){ if(e.target===o) o.style.display="none"; });
   o.querySelector(".dov-close").addEventListener("click",function(){ o.style.display="none"; });
+  o.querySelector(".dov-open").addEventListener("click",function(){ if(o._deckUrl) window.open(o._deckUrl,"_blank"); });
+  o.querySelector(".dov-edit").addEventListener("click",function(){ o.style.display="none"; try{ setStep("brief"); window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} });
+  o.querySelector(".dov-new").addEventListener("click",function(){ o.style.display="none"; try{ if(window.NORM_newBrief) window.NORM_newBrief(); }catch(e){} });
   return o;
 }
-function showDeckOverlay(state,msg){
+function showDeckOverlay(state,msg,deckUrl){
   const ar=(typeof LANG!=="undefined"&&LANG==="ar"); const o=deckOverlay();
-  const ring=o.querySelector(".dov-ring"),title=o.querySelector(".dov-title"),sub=o.querySelector(".dov-sub"),close=o.querySelector(".dov-close");
+  const ring=o.querySelector(".dov-ring"),check=o.querySelector(".dov-check"),title=o.querySelector(".dov-title"),sub=o.querySelector(".dov-sub"),close=o.querySelector(".dov-close"),actions=o.querySelector(".dov-actions");
   o.querySelector(".deck-ov-card").setAttribute("dir",ar?"rtl":"ltr");
+  o._deckUrl=deckUrl||"";
   close.textContent=ar?"إغلاق":"Close";
-  if(state==="loading"){ ring.style.display=""; close.style.display="none";
+  ring.style.display="none"; check.style.display="none"; actions.style.display="none"; close.style.display="none";
+  if(state==="loading"){ ring.style.display="";
     title.textContent=ar?"جارٍ إنشاء العرض":"Building your deck";
-    sub.textContent=ar?"نُجهّز عرض Google Slides الخاص بك. قد يستغرق ذلك دقيقة، وسيُفتح في تبويب جديد.":"Preparing your Google Slides deck. This can take a minute, and it opens in a new tab."; }
-  else if(state==="sent"){ ring.style.display=""; close.style.display="inline-block";
-    title.textContent=ar?"تم الإرسال":"Sent to Google Slides";
-    sub.textContent=ar?"يتم إنشاء عرضك الآن، وسيُفتح في التبويب الجديد عند جهوزه.":"Your deck is generating now and will open in the new tab when it’s ready."; }
+    sub.textContent=ar?"نُجهّز عرض Google Slides الخاص بك. أبقِ هذه الصفحة مفتوحة حتى يكتمل.":"Preparing your Google Slides deck. Keep this page open until it is complete."; }
+  else if(state==="success"){ check.style.display="flex"; actions.style.display="grid";
+    title.textContent=ar?"العرض جاهز":"Deck ready";
+    sub.textContent=msg||(ar?"اكتمل إنشاء العرض وتم فتحه في تبويب جديد.":"Your deck is complete and has been opened in a new tab.");
+    o.querySelector(".dov-open").textContent=ar?"افتح العرض":"Open deck";
+    o.querySelector(".dov-edit").textContent=ar?"العودة والتعديل":"Go back and edit";
+    o.querySelector(".dov-new").textContent=ar?"إنشاء بريف جديد":"Create a new brief"; }
   else if(state==="popup"){ ring.style.display="none"; close.style.display="inline-block";
     title.textContent=ar?"منع المتصفّح فتح التبويب":"Your browser blocked the tab";
     sub.textContent=ar?"اسمح بالنوافذ المنبثقة لهذا الموقع ثم اضغط «إنشاء العرض» مرة أخرى.":"Allow pop-ups for this site, then click Create again."; }
@@ -1582,7 +1590,19 @@ function showDeckOverlay(state,msg){
     sub.textContent=msg||(ar?"تحقّق من رابط الخدمة وحاول مجددًا.":"Check the service link and try again."); }
   o.style.display="flex";
 }
-let _deckSending=false;
+let _deckSending=false,_deckWatchdog=null,_deckToken="";
+function resetDeckSending(){ _deckSending=false; _deckToken=""; const b=document.getElementById("make-deck"); if(b)b.disabled=false; if(_deckWatchdog){clearTimeout(_deckWatchdog);_deckWatchdog=null;} }
+window.addEventListener("message",function(ev){
+  const d=ev.data||{};
+  if(d.type!=="norm-deck-result"||!_deckToken||d.token!==_deckToken)return;
+  resetDeckSending();
+  if(d.ok&&/^https:\/\/docs\.google\.com\/presentation\/d\//.test(d.url||"")){
+    let opened=null; try{opened=window.open(d.url,"_blank"); if(opened)opened.opener=null;}catch(e){}
+    const note=(typeof LANG!=="undefined"&&LANG==="ar")?(opened?"اكتمل إنشاء العرض وتم فتحه في تبويب جديد.":"اكتمل إنشاء العرض. اضغط «افتح العرض» للانتقال إليه."):(opened?"Your deck is complete and has been opened in a new tab.":"Your deck is complete. Use Open deck to view it.");
+    showDeckOverlay("success",note,d.url);
+    try{if(window.NORM_refreshBriefs)window.NORM_refreshBriefs();}catch(e){}
+  }else showDeckOverlay("error",d.message||"");
+});
 document.getElementById("make-deck").addEventListener("click",async ()=>{
   if(_deckSending) return;
   if(!validateBrief()){ setStep("brief"); return; }
@@ -1590,13 +1610,13 @@ document.getElementById("make-deck").addEventListener("click",async ()=>{
   if(!url){ if(foot)foot.textContent=t("nourl"); showDeckOverlay("error",t("nourl")); return; }
   if(foot)foot.textContent=t("creating");
   _deckSending=true; var _mk=document.getElementById("make-deck"); if(_mk) _mk.disabled=true;
-  var _resetSend=function(){ _deckSending=false; if(_mk) _mk.disabled=false; };
-  setTimeout(_resetSend,8000);
-  const win=window.open("about:blank","norm_deck");
-  if(win){ try{ win.document.open(); win.document.write(loadingHTML()); win.document.close(); }catch(e){} }
+  _deckToken=Date.now().toString(36)+"_"+Math.random().toString(36).slice(2);
+  showDeckOverlay("loading");
+  _deckWatchdog=setTimeout(function(){ resetDeckSending(); showDeckOverlay("error",(typeof LANG!=="undefined"&&LANG==="ar")?"استغرق إنشاء العرض وقتًا أطول من المتوقع. تحقّق من اتصالك وحاول مجددًا.":"The deck is taking longer than expected. Check your connection and try again."); },180000);
   let data; try{ data=await buildFullPayload(); }catch(e){ data=payload(); }
-  try{ const f=document.getElementById("deck-form"); f.action=url; f.target="norm_deck"; document.getElementById("deck-payload").value=JSON.stringify(data); f.submit(); if(!win) showDeckOverlay("popup"); }
-  catch(err){ if(win){try{win.close();}catch(e){}} if(foot)foot.textContent=t("nourl"); showDeckOverlay("error",t("nourl")); _resetSend(); }
+  data.CALLBACK_TOKEN=_deckToken;
+  try{ const f=document.getElementById("deck-form"); f.action=url; f.target="norm_deck_bridge"; document.getElementById("deck-payload").value=JSON.stringify(data); f.submit(); }
+  catch(err){ if(foot)foot.textContent=t("nourl"); showDeckOverlay("error",t("nourl")); resetDeckSending(); }
 });
 document.getElementById("copy-brief").addEventListener("click",e=>{ navigator.clipboard&&navigator.clipboard.writeText(document.getElementById("briefbox").textContent); const sp=e.currentTarget.querySelector("span"); const o=sp.textContent; sp.textContent=t("copied"); setTimeout(()=>sp.textContent=o,1600); });
 const briefmodal=document.getElementById("briefmodal");
@@ -2072,7 +2092,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   "#nb-panel{position:fixed;top:0;bottom:0;z-index:9995;width:min(340px,86vw);background:#FBFBF9;box-shadow:0 0 60px -10px rgba(0,0,0,.4);display:flex;flex-direction:column;transition:transform .34s cubic-bezier(.4,0,.2,1);font-family:var(--display),system-ui,sans-serif;}"+
   "html:not(.ar) #nb-panel{left:0;transform:translateX(-102%);border-right:1px solid #E4E3DC;}"+
   "html.ar #nb-panel{right:0;transform:translateX(102%);border-left:1px solid #E4E3DC;}"+
-  "#nb-panel.on{transform:none;}"+
+  "html:not(.ar) #nb-panel.on,html.ar #nb-panel.on{transform:translateX(0)!important;visibility:visible!important;opacity:1!important;}"+
   "#nb-head{padding:20px 20px 15px;border-bottom:1px solid #EDECE6;}"+
   "#nb-head .nb-t{font-size:17px;font-weight:700;color:#17181C;display:flex;align-items:center;justify-content:space-between;gap:10px;}"+
   "#nb-head .nb-x{background:transparent;border:0;font-size:22px;color:#9A9A93;cursor:pointer;line-height:1;padding:0;}#nb-head .nb-x:hover{color:#17181C;}"+
@@ -2107,8 +2127,22 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     panel.querySelector("#nb-new").addEventListener("click",function(){ if(window.NORM_newBrief) window.NORM_newBrief(); });
   }
   function relabel(){ if(!toggle) return; toggle.querySelector(".nb-lbl").textContent=tx("My briefs","بريفاتي"); panel.querySelector(".nb-title").textContent=tx("My briefs","بريفاتي"); panel.querySelector("#nb-new").textContent=tx("+ New brief","+ بريف جديد"); panel.setAttribute("dir",AR()?"rtl":"ltr"); toggle.setAttribute("dir",AR()?"rtl":"ltr"); }
-  function open(){ panel.classList.add("on"); backdrop.classList.add("on"); fetchList(); }
-  function close(){ panel.classList.remove("on"); backdrop.classList.remove("on"); }
+  function open(){
+    panel.classList.add("on");
+    panel.style.display="flex";
+    panel.style.visibility="visible";
+    panel.style.opacity="1";
+    panel.style.transform="translateX(0)";
+    panel.style.zIndex="10001";
+    backdrop.style.zIndex="10000";
+    backdrop.classList.add("on");
+    fetchList();
+  }
+  function close(){
+    panel.classList.remove("on");
+    panel.style.transform=AR()?"translateX(102%)":"translateX(-102%)";
+    backdrop.classList.remove("on");
+  }
   function rel(ts){ if(!ts) return ""; var d=Date.now()-ts, m=60000, h=3600000, day=86400000; if(d<h) return tx(Math.max(1,Math.round(d/m))+"m ago","منذ "+Math.max(1,Math.round(d/m))+" د"); if(d<day) return tx(Math.round(d/h)+"h ago","منذ "+Math.round(d/h)+" س"); if(d<day*7) return tx(Math.round(d/day)+"d ago","منذ "+Math.round(d/day)+" ي"); return new Date(ts).toLocaleDateString(); }
   function badge(st){ var map={"Draft":["nb-b-draft",tx("Draft","مسودة")],"Deck Built":["nb-b-built",tx("Deck built","تم الإنشاء")],"Submitted":["nb-b-built",tx("Submitted","مُرسل")],"In Progress":["nb-b-prog",tx("In progress","قيد التنفيذ")],"Delivered":["nb-b-deliv",tx("Delivered","تم التسليم")]}; return map[st]||["nb-b-draft",st||""]; }
   function render(items){
