@@ -4,7 +4,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="norm-build" content="2026.07.12.4" />
+<meta name="norm-build" content="2026.07.12.5" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script>window.NORM_BUILD="2026.07.12.4";</script>
+<script>window.NORM_BUILD="2026.07.12.5";</script>
 <style>
   :root{--bg:#ECECE8;--surface:#FCFCFA;--surface-2:#F6F6F2;--ink:#17181C;--muted:#74756F;--line:#DEDDD6;--line-strong:#CFCEC5;--accent:#d72120;--accent-soft:rgba(215,33,32,.07);--accent-soft-2:rgba(215,33,32,.13);--mot:#2563EB;--mot-soft:rgba(37,99,235,.10);--lit:#2563EB;--lit-soft:rgba(37,99,235,.10);--gold:#E0A93B;--prem:#12996A;--prem-soft:#E9F6EE;--prem-line:#B7E0C7;--prem-deep:#0E7A4F;--radius:14px;--radius-sm:10px;--display:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"Space Mono",ui-monospace,monospace;--shadow:0 1px 2px rgba(23,24,28,.04),0 8px 24px -16px rgba(23,24,28,.18);}
   html.ar{--display:"Tajawal",system-ui,sans-serif;--body:"Tajawal",system-ui,sans-serif;--mono:"Tajawal",system-ui,sans-serif;}
@@ -100,6 +100,9 @@
   .fld input,.fld textarea{border:0;border-bottom:1.5px solid var(--line-strong);background:transparent;padding:6px 2px;font-size:14.5px;transition:.18s;width:100%;resize:vertical;}
   .fld textarea.grow{resize:none;overflow:hidden;min-height:30px;line-height:1.4;}
   .fld input::placeholder,.fld textarea::placeholder{color:#b7b7af;}
+  .fld .fguide{min-height:16px;margin-top:1px;font-family:var(--mono);font-size:9.5px;line-height:1.35;color:#96978f;letter-spacing:.01em;text-align:end;}
+  html.ar .fld .fguide{font-family:var(--display);font-size:10.5px;letter-spacing:0;}
+  .fld .fguide.short{color:#B06B26;}.fld .fguide.done{color:#53806b;}
   .fld input:focus,.fld textarea:focus{outline:none;border-color:var(--accent);}
   .fld.invalid input,.fld.invalid textarea{border-color:#D9534F;background:#FCF3F2;}
   .fld .ferr{display:none;font-family:var(--mono);font-size:9.5px;color:#C0392B;letter-spacing:.02em;margin-top:2px;}
@@ -546,7 +549,7 @@
     .step{flex:1;justify-content:center;min-height:32px;border-radius:8px;font-size:11px;}
     .step .n{width:25px;height:25px;}.step .nm{display:inline;font-size:11px;}.step-sep{width:10px;flex:none;}
 
-    .wrap{width:100%;padding:16px 12px calc(154px + env(safe-area-inset-bottom));}
+    .wrap{width:100%;padding:16px 12px calc(104px + env(safe-area-inset-bottom));}
     .lead{margin:2px 2px 18px;}.lead h1{font-size:29px;line-height:1.12;}.lead p{font-size:14px;line-height:1.6;margin-top:8px;}
     .eyebrow{font-size:10px;margin-bottom:6px;}.sec-title{margin-top:22px;}
 
@@ -554,7 +557,10 @@
     .meta,.about{grid-template-columns:1fr;padding:15px 14px;gap:18px;border-radius:13px;}
     .fld.full{grid-column:auto;}.fld{gap:6px;}.fld label{font-size:10px;line-height:1.35;}
     .fld input,.fld textarea,.specf input[type=text],.specf input[type=number],.dimf input[type=number],.notef textarea,.urlbox input{font-size:16px!important;min-height:46px;padding:10px 4px;}
-    .fld textarea.grow{min-height:48px;line-height:1.55;}
+    .fld textarea.grow{min-height:58px;line-height:1.55;}
+    .fld input::placeholder,.fld textarea::placeholder,.notef textarea::placeholder,.urlbox input::placeholder{font-size:12px!important;line-height:1.45;color:#a9aaa2;}
+    .fld .fguide{font-size:9px;line-height:1.25;white-space:normal;overflow-wrap:anywhere;}
+    html.ar .fld .fguide{font-size:10px;}
     .mseg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}.mseg button{min-height:46px;padding:10px;}
     .mseg.tier{display:grid;grid-template-columns:1fr;}.mseg.tier button{min-height:62px;}
     .sectors{grid-template-columns:1fr;gap:9px;}.sector{padding:14px;min-height:94px;}.sector h3{font-size:17px;}
@@ -565,7 +571,7 @@
     .search{grid-column:1/-1;min-height:48px;flex:none;padding:10px 13px;}.search input{font-size:16px;}
     .toolbar .tcount{grid-column:1/-1;grid-row:2;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:7px;}
     .toolbar .linkbtn{min-height:40px;padding:8px 10px;text-align:center;}
-    .navchips{position:sticky;top:105px;z-index:25;margin:0 -12px 10px;padding:9px 12px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);scrollbar-width:none;scroll-snap-type:x proximity;}
+    .navchips{position:relative;top:auto;z-index:1;margin:0 -12px 10px;padding:9px 12px;background:transparent;backdrop-filter:none;scrollbar-width:none;scroll-snap-type:x proximity;}
     .navchips::-webkit-scrollbar{display:none;}.navchip{min-height:40px;padding:7px 12px;scroll-snap-align:start;}
     .grid{display:flex;flex-direction:column;gap:12px;}.grid>aside{order:-1;width:100%;}.grid>div:first-child{order:1;width:100%;min-width:0;}
     .rail{position:static;}.rail-card{border-radius:12px;}.rail-top{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:0;}
@@ -598,13 +604,14 @@
     /* Bottom navigation remains reachable above the browser home indicator. */
     .footnav{padding:9px 12px calc(9px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 96%,transparent);border-top:1px solid var(--line);backdrop-filter:blur(12px);}
     .footnav-in{gap:8px;}.footcount{display:none;}.footnav .btn{min-height:48px;padding:10px 13px;justify-content:center;}.footnav #fwd-btn{flex:1;max-width:76%;}.footnav #back-btn{flex:0 0 auto;}
-    #norm-signed{top:auto!important;bottom:calc(77px + env(safe-area-inset-bottom))!important;max-width:54vw!important;overflow:hidden!important;}
+    #norm-signed,#norm-signin-btn{position:static!important;inset:auto!important;grid-column:1;grid-row:3;justify-self:start;max-width:100%!important;min-height:38px;overflow:hidden!important;box-shadow:none!important;}
     #norm-signed>span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    #nb-toggle{bottom:calc(78px + env(safe-area-inset-bottom))!important;padding:11px 14px!important;}
+    #nb-toggle{position:static!important;inset:auto!important;grid-column:2;grid-row:3;justify-self:end;margin:0!important;padding:9px 13px!important;min-height:38px;box-shadow:none!important;}
     #nb-panel{width:100vw!important;max-width:none!important;padding-top:env(safe-area-inset-top);}
     #norm-gate{align-items:flex-end!important;padding:0!important;}.ng-card{max-width:none!important;border-radius:22px 22px 0 0!important;padding:26px 18px calc(22px + env(safe-area-inset-bottom))!important;max-height:94dvh!important;overflow:auto!important;}
     #norm-gate input,#norm-gate .ng-sel{font-size:16px!important;min-height:48px!important;}
     .ai-toast{bottom:calc(86px + env(safe-area-inset-bottom));max-width:calc(100% - 24px);width:max-content;}
+    .norm-toast{bottom:calc(86px + env(safe-area-inset-bottom))!important;width:calc(100% - 24px)!important;justify-content:center;flex-wrap:wrap;}
   }
   @media(max-width:370px){
     .step .nm{display:none;}.steps{padding-inline:18px;}.lead h1{font-size:26px;}.footnav #fwd-btn{max-width:72%;}.footnav .btn{font-size:13px;padding-inline:10px;}.quickrow{grid-template-columns:repeat(2,1fr);}
@@ -747,6 +754,8 @@ Object.assign(STR.en,{ai_busy:"The AI service is temporarily unavailable. Try ag
 Object.assign(STR.ar,{ai_busy:"خدمة الذكاء الاصطناعي غير متاحة مؤقتًا. حاول بعد قليل.",ai_rate:"وصل الذكاء الاصطناعي إلى حد الاستخدام. انتظر قليلًا ثم حاول مجددًا.",ai_config:"الذكاء الاصطناعي غير مُعدّ. أضف مفتاح المزود في Apps Script.",ai_auth:"اتصال الذكاء الاصطناعي يحتاج إلى مراجعة. تحقّق من المفتاح وصلاحية النموذج.",ai_temp:"خدمة الذكاء الاصطناعي غير متاحة مؤقتًا. حاول بعد قليل.",ai_timeout:"استغرق طلب الذكاء الاصطناعي وقتًا طويلًا. حاول مجددًا.",ai_invalid:"أعاد الذكاء الاصطناعي نتيجة غير مكتملة. حاول مجددًا."});
 Object.assign(STR.en,{hint:"The staged progress stays in this app. When the deck is ready, choose Open deck, Go back and edit, or Create a new brief."});
 Object.assign(STR.ar,{hint:"يظهر تقدّم الإنشاء داخل التطبيق. عند جاهزية العرض، اختر فتح العرض أو العودة والتعديل أو إنشاء بريف جديد."});
+Object.assign(STR.en,{valShort:"These fields need a little more detail:",charWord:"{count}/{max} characters · minimum {min} word",charWords:"{count}/{max} characters · minimum {min} words",charOptional:"{count}/{max} characters · optional"});
+Object.assign(STR.ar,{valShort:"هذه الحقول تحتاج إلى تفاصيل أكثر قليلًا:",charWord:"{count}/{max} حرفًا · كلمة واحدة على الأقل",charWords:"{count}/{max} حرفًا · {min} كلمات على الأقل",charOptional:"{count}/{max} حرفًا · اختياري"});
 let LANG="en"; const t=k=>STR[LANG][k]||k; const pad=n=>String(n).padStart(2,"0");
 
 const DATA=[
@@ -977,14 +986,25 @@ const ABOUT=[["a-name","f_name"],["a-namemean","f_namemean"],["a-industry","f_in
   [["a-slogan","slogan"],["a-notes","notes"]].forEach(([id,k])=>{ const f=document.createElement("div"); f.className="fld full"; f.innerHTML=`<label data-i18n="${k}">${t(k)}</label><textarea id="${id}" rows="2" data-ph="ph_${k}" placeholder="${esc(t('ph_'+k))}"></textarea>`; el.appendChild(f); });
 })();
 
-function aboutComplete(){ return ABOUT.every(([id])=>(val(id)||"").trim()!==""); }
-function updateScopeGate(){ const sw=document.getElementById("scopewrap"); if(!sw)return; const total=ABOUT.length; let done=0; ABOUT.forEach(([id])=>{ if((val(id)||"").trim()!=="")done++; }); const ok=done===total; sw.classList.toggle("locked",!ok); const p=document.getElementById("scope-prog"); if(p)p.textContent=ok?"":(done+" / "+total); }
+/* Each field has its own sensible limit. Short factual answers may be one word;
+   only genuinely descriptive fields ask for more detail. */
+const FIELD_RULES={
+  "m-submitter":{max:80,min:1},"a-name":{max:90,min:1},"a-namemean":{max:180,min:1},
+  "a-industry":{max:120,min:1},"a-loc":{max:120,min:1},"a-does":{max:320,min:1},
+  "a-audience":{max:320,min:2},"a-usp":{max:320,min:2},"a-market":{max:260,min:1},
+  "a-refs":{max:420,min:1},"a-about":{max:700,min:5},"a-mvv":{max:600,min:5},
+  "a-personality":{max:120,min:3},"a-tone":{max:140,min:1},"a-comp":{max:320,min:1},
+  "a-keep":{max:260,min:1},"a-avoid":{max:260,min:1},"a-slogan":{max:140,min:0},"a-notes":{max:500,min:0}
+};
+function fieldRuleMet(id){ const r=FIELD_RULES[id]||{min:1},v=(val(id)||"").trim(); return !!v&&wordCount(v)>=(r.min||1); }
+function fieldGuideText(id){ const el=document.getElementById(id),r=FIELD_RULES[id]; if(!el||!r)return ""; const count=Array.from(el.value||"").length; let key=r.min===0?"charOptional":(r.min===1?"charWord":"charWords"); return t(key).replace("{count}",count).replace("{max}",r.max).replace("{min}",r.min); }
+function refreshFieldGuide(id){ const el=document.getElementById(id),r=FIELD_RULES[id]; if(!el||!r)return; const g=el.closest(".fld")&&el.closest(".fld").querySelector('.fguide[data-for="'+id+'"]'); if(!g)return; const words=wordCount(el.value),count=Array.from(el.value||"").length; g.textContent=fieldGuideText(id); g.classList.toggle("short",count>0&&r.min>0&&words<r.min); g.classList.toggle("done",r.min===0?count>0:words>=r.min); }
+function refreshAllFieldGuides(){ Object.keys(FIELD_RULES).forEach(refreshFieldGuide); }
+(function installFieldGuides(){ Object.keys(FIELD_RULES).forEach(function(id){ const el=document.getElementById(id),r=FIELD_RULES[id]; if(!el)return; el.maxLength=r.max; const w=el.closest(".fld"); if(!w)return; const g=document.createElement("span"); g.className="fguide"; g.dataset.for=id; g.setAttribute("aria-live","polite"); el.insertAdjacentElement("afterend",g); el.addEventListener("input",function(){refreshFieldGuide(id);}); refreshFieldGuide(id); }); })();
+
+function aboutComplete(){ return ABOUT.every(([id])=>fieldRuleMet(id)); }
+function updateScopeGate(){ const sw=document.getElementById("scopewrap"); if(!sw)return; const total=ABOUT.length; let done=0; ABOUT.forEach(([id])=>{ if(fieldRuleMet(id))done++; }); const ok=done===total; sw.classList.toggle("locked",!ok); const p=document.getElementById("scope-prog"); if(p)p.textContent=ok?"":(done+" / "+total); }
 document.getElementById("about").addEventListener("input",e=>{ if(e.target.tagName==="TEXTAREA"){ e.target.style.height="auto"; e.target.style.height=(e.target.scrollHeight)+"px"; } updateScopeGate(); });
-(function inputCaps(){
-  var L={"a-about":4000,"a-slogan":1000,"a-notes":1000,"a-refs":600,"a-loc":200,"a-name":200,"a-namemean":300,"a-industry":200};
-  document.querySelectorAll('[id^="a-"]').forEach(function(el){ if(el.tagName==="TEXTAREA"||el.tagName==="INPUT"){ el.maxLength=L[el.id]||1200; } });
-  var sub=document.getElementById("m-submitter"); if(sub) sub.maxLength=120;
-})();
 
 /* ================= LIVE AI FEATURES ================= */
 const AI_ICON='<svg class="ai-spark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1C12.5 6.5 17.5 11.5 23 12C17.5 12.5 12.5 17.5 12 23C11.5 17.5 6.5 12.5 1 12C6.5 11.5 11.5 6.5 12 1Z" fill="url(#aiGrad)"/></svg>';
@@ -1674,13 +1694,16 @@ function showDeckOverlay(state,msg,deckUrl){
   o._deckUrl=deckUrl||"";
   close.textContent=ar?"إغلاق":"Close";
   stopDeckProgress(); ring.style.display="none"; check.style.display="none"; actions.style.display="none"; close.style.display="none"; progress.style.display="none";
+  sub.style.cssText="font-size:13.5px;line-height:1.65;color:var(--muted,#74756F);";
   if(state==="loading"){ ring.style.display="";
     title.textContent=ar?"جارٍ إنشاء العرض":"Building your deck";
     sub.textContent=ar?"نُجهّز عرض Google Slides الخاص بك. أبقِ هذه الصفحة مفتوحة حتى يكتمل.":"Preparing your Google Slides deck. Keep this page open until it is complete.";
     progress.style.display="block"; startDeckProgress(); }
   else if(state==="success"){ check.style.display="flex"; actions.style.display="grid";
-    title.textContent=ar?"العرض جاهز":"Deck ready";
-    sub.textContent=msg||(ar?"اكتمل إنشاء العرض وتم فتحه في تبويب جديد.":"Your deck is complete and has been opened in a new tab.");
+    title.textContent=ar?"تم إنشاء العرض — تبقّت خطوة أخيرة":"Deck created — one step left";
+    const refStep=ar?"تبقّت خطوة أخيرة: قم بإضافة صور مرجعية للفريق الفني في شريحة «المراجع والاتجاه» داخل الملف قبل مشاركته.":"One final step remains: add reference images for the creative team on the “References & direction” slide before sharing the deck.";
+    sub.textContent=(msg&&/CRM|مزامنته مع CRM/i.test(msg))?(msg+" "+refStep):refStep;
+    sub.style.cssText+="margin-top:14px;padding:12px 13px;border-radius:10px;background:#FFF5E5;color:#7A5414;font-weight:600;border:1px solid #EBD6AA;";
     o.querySelector(".dov-open").textContent=ar?"افتح العرض":"Open deck";
     o.querySelector(".dov-edit").textContent=ar?"العودة والتعديل":"Go back and edit";
     o.querySelector(".dov-new").textContent=ar?"إنشاء بريف جديد":"Create a new brief"; }
@@ -1798,17 +1821,10 @@ function devFill(){
   Object.entries(FILL).forEach(([id,v])=>{ const el=document.getElementById(id); if(el)el.value=v; });
   itemEls.forEach(r=>{ if(!selected.has(r.id)){ selected.add(r.id); r.el.classList.add("sel"); r.el.setAttribute("aria-checked","true"); } });
   document.querySelectorAll(".fld.invalid").forEach(x=>x.classList.remove("invalid"));
-  refresh(); updateGate(); updateScopeGate();
+  refreshAllFieldGuides(); refresh(); updateGate(); updateScopeGate();
 }
 document.getElementById("devfill").addEventListener("click",devFill);
 if(location.hostname&&!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)){var _df=document.getElementById("devfill");if(_df)_df.style.display="none";}
-/* field length caps — matched to what the deck cards can hold */
-(function(){
-  var CAPS={"m-submitter":80,"a-name":90,"a-namemean":180,"a-industry":120,"a-loc":120,"a-personality":120,"a-tone":140,
-            "a-does":320,"a-audience":320,"a-usp":320,"a-market":260,"a-refs":420,"a-about":700,"a-mvv":600,"a-comp":320,"a-keep":260,"a-avoid":260};
-  Object.keys(CAPS).forEach(function(id){ var el=document.getElementById(id); if(el){ try{ el.maxLength=CAPS[id]; }catch(e){} } });
-})();
-
 /* ---------- submission gate ---------- */
 const _gatewrap=document.getElementById("gatewrap");
 function updateGate(){ const ok=((document.getElementById("m-submitter").value||"").trim()!=="") && !!mSource && !!tier; if(_gatewrap)_gatewrap.classList.toggle("open",ok); if(ok && !_tutShown){ _tutShown=true; setTimeout(runTutorial,90); } }
@@ -1872,7 +1888,6 @@ document.getElementById("cm-no").addEventListener("click",hideConfirm);
 cmodal.addEventListener("click",e=>{ if(e.target===cmodal)hideConfirm(); });
 
 /* ---------- about validation ---------- */
-const MINW=3; const LONGF=new Set(["a-does","a-audience","a-usp","a-about","a-mvv","a-personality","a-tone","a-comp","a-keep","a-avoid"]);
 function wordCount(s){ return ((s||"").trim().match(/\S+/g)||[]).length; }
 function fldWrap(id){ const el=document.getElementById(id); return el?el.closest(".fld"):null; }
 function validateBrief(){
@@ -1885,7 +1900,7 @@ function validateBrief(){
     const empty=(val===""), shortish=(!empty && wordCount(el.value)<minw), good=(!empty&&!shortish);
     if(w)w.classList.toggle("invalid",!good); if(!good&&!firstBad)firstBad=w||el;
     if(empty) missing.push(labelFor(id));
-    else if(shortish) tooShort.push(labelFor(id));
+    else if(shortish){ const need=LANG==="ar"?(minw===1?"كلمة واحدة على الأقل":minw+" كلمات على الأقل"):("minimum "+minw+" word"+(minw===1?"":"s")); tooShort.push(labelFor(id)+" ("+need+")"); }
     return good;
   };
   // submission fields
@@ -1893,13 +1908,13 @@ function validateBrief(){
   const _srcF=document.getElementById("m-source").closest(".fld"), _tierF=document.getElementById("m-tier").closest(".fld");
   if(!mSource){ ok=false; if(_srcF){_srcF.classList.add("invalid"); if(!firstBad)firstBad=_srcF;} missing.push(t("f_source")); } else if(_srcF) _srcF.classList.remove("invalid");
   if(!tier){ ok=false; if(_tierF){_tierF.classList.add("invalid"); if(!firstBad)firstBad=_tierF;} missing.push(t("f_tier")); } else if(_tierF) _tierF.classList.remove("invalid");
-  ABOUT.forEach(([id])=>{ ok=check(id,LONGF.has(id)?MINW:1)&&ok; });
+  ABOUT.forEach(([id])=>{ ok=check(id,(FIELD_RULES[id]&&FIELD_RULES[id].min)||1)&&ok; });
   if(!ok){
     if(firstBad)firstBad.scrollIntoView({behavior:"smooth",block:"center"});
     // build a specific, itemised message
     var parts=[];
     if(missing.length) parts.push('<div style="margin-bottom:6px"><b>'+t("valMissing")+'</b></div><div style="color:#B0413A">'+missing.join(t("listSep"))+'</div>');
-    if(tooShort.length) parts.push('<div style="margin:12px 0 6px"><b>'+t("valShort").replace("{n}",MINW)+'</b></div><div style="color:#B0413A">'+tooShort.join(t("listSep"))+'</div>');
+    if(tooShort.length) parts.push('<div style="margin:12px 0 6px"><b>'+t("valShort")+'</b></div><div style="color:#B0413A">'+tooShort.join(t("listSep"))+'</div>');
     showConfirm(t("valTitle"), parts.join(""), t("valFix"), "", null);
   }
   return ok;
@@ -1936,6 +1951,7 @@ function setLang(l){
   catRefs.forEach((c,ci)=>{ c.titleEl.textContent=DATA[ci][l]; c.nameEl.textContent=DATA[ci][l]; });
   itemEls.forEach(r=>r.lbl.textContent=r[l]);
   document.getElementById("toggle-all").textContent=allCollapsed?t("expandall"):t("collapseall");
+  refreshAllFieldGuides();
   buildProfiles(); refresh();
   document.querySelectorAll(".ai-fbtn").forEach(b=>b.title=t("ai_help"));
   const cur=document.querySelector(".view.active").id.replace("step-",""); if(cur==="mockups")buildMockups(); if(cur==="handoff")buildHandoff();
@@ -2005,7 +2021,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     try{ mSource=""; document.querySelectorAll('#m-source button').forEach(function(b){ b.classList.remove("on"); }); }catch(e){}
     try{ tier=""; document.querySelectorAll('#m-tier button').forEach(function(b){ b.classList.remove("on"); }); }catch(e){}
     try{ profile=""; document.querySelectorAll('.profcard.on').forEach(function(b){ b.classList.remove("on"); }); }catch(e){}
-    try{ updateGate&&updateGate(); updateScopeGate&&updateScopeGate(); refresh&&refresh(); }catch(e){}
+    try{ refreshAllFieldGuides(); updateGate&&updateGate(); updateScopeGate&&updateScopeGate(); refresh&&refresh(); }catch(e){}
   }
   // full reset: fields + local draft + server draft + block auto-restore, then land clean
   window.NORM_resetAll=function(opts){
@@ -2026,6 +2042,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   window.NORM_newBrief=function(){ window.NORM_resetAll(); try{ reached=0; setStep("brief"); window.scrollTo({top:0,behavior:"smooth"}); }catch(e){} };
   function toast(msg){
     var ar=(LANG==="ar"); var d=document.createElement("div");
+    d.className="norm-toast";
     d.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:9998;display:flex;align-items:center;gap:13px;background:var(--ink,#17181C);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;box-shadow:0 18px 50px -16px rgba(0,0,0,.5);max-width:calc(100% - 32px);";
     d.setAttribute("dir",ar?"rtl":"ltr");
     d.innerHTML='<span>'+(msg||(ar?"تم استرجاع مسودّتك المحفوظة.":"Your saved draft was restored."))+'</span><button type="button" style="background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 11px;font:inherit;font-size:12px;cursor:pointer;white-space:nowrap;">'+(ar?"ابدأ من جديد":"Start fresh")+'</button><button type="button" aria-label="close" style="background:transparent;border:0;color:rgba(255,255,255,.6);font-size:18px;line-height:1;cursor:pointer;padding:0 2px;">×</button>';
@@ -2041,6 +2058,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     selected.clear(); recd.clear(); laterItems.clear(); clearMap(vsel); clearMap(dims); clearMap(spec);
     mSource=""; tier=""; profile=null;
     document.querySelectorAll('#m-source button,#m-tier button').forEach(function(b){b.classList.remove("on");});
+    try{ refreshAllFieldGuides(); }catch(e){}
   }
   function validRec(id){ return itemEls.find(function(x){return x.id===id;}); }
   function restorePrintState(s){
@@ -2078,7 +2096,7 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     (Array.isArray(s.sel)?s.sel:[]).forEach(function(id){ if(validRec(id))selected.add(id); });
     restorePrintState(s);
     itemEls.forEach(function(r){ r.el.classList.toggle("sel",selected.has(r.id)); r.el.setAttribute("aria-checked",selected.has(r.id)); });
-    try{ refresh(); updateScopeGate(); updateGate(); }catch(e){}
+    try{ refreshAllFieldGuides(); refresh(); updateScopeGate(); updateGate(); }catch(e){}
   }
   window.NORM_loadDraft=function(s,id){
     if(id) window.NORM_BRIEFID=id;
@@ -2273,7 +2291,8 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     btn.style.cssText="position:fixed;top:11px;z-index:9990;background:#d72120;color:#fff;border:0;border-radius:999px;padding:8px 17px;font-family:var(--display),system-ui,sans-serif;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 4px 14px -5px rgba(215,33,32,.55);";
     btn.style[AR()?"left":"right"]="14px";
     btn.addEventListener("click",function(){ if(btn.parentNode) btn.parentNode.removeChild(btn); buildGate(); });
-    document.body.appendChild(btn);
+    var host=(window.matchMedia&&window.matchMedia("(max-width:700px)").matches)?document.querySelector(".topbar-in"):document.body;
+    (host||document.body).appendChild(btn);
   }
   function showChip(){
     var _sib=document.getElementById("norm-signin-btn"); if(_sib) _sib.remove();
@@ -2281,7 +2300,8 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
     var chip=document.createElement("div"); chip.id="norm-signed"; chip.setAttribute("dir",AR()?"rtl":"ltr");
     var _n=(window.NORM_NAME||savedName||localStorage.getItem("norm_email_v1")||""), _r=(window.NORM_ROLE?roleLabel(window.NORM_ROLE):""); var who=_n?(_n+(_r?" · "+_r:"")):_r;
     chip.innerHTML='<span class="ng-dot"></span><span>'+who+'</span><a id="norm-so">'+tx("signout")+'</a>';
-    document.body.appendChild(chip);
+    var host=(window.matchMedia&&window.matchMedia("(max-width:700px)").matches)?document.querySelector(".topbar-in"):document.body;
+    (host||document.body).appendChild(chip);
     chip.querySelector("#norm-so").addEventListener("click",function(){ try{localStorage.removeItem(TK);}catch(e){} window.NORM_SESSION=""; location.reload(); });
   }
   function playIntro(){
@@ -2341,7 +2361,8 @@ buildProfiles(); setLang("ar"); setStep("brief"); updateGate(); updateScopeGate(
   function build(){
     toggle=document.createElement("button"); toggle.id="nb-toggle"; toggle.type="button";
     toggle.innerHTML='<span class="nb-ic">☰</span><span class="nb-lbl"></span>';
-    document.body.appendChild(toggle);
+    var toggleHost=(window.matchMedia&&window.matchMedia("(max-width:700px)").matches)?document.querySelector(".topbar-in"):document.body;
+    (toggleHost||document.body).appendChild(toggle);
     backdrop=document.createElement("div"); backdrop.id="nb-backdrop"; document.body.appendChild(backdrop);
     panel=document.createElement("aside"); panel.id="nb-panel"; panel.setAttribute("dir",AR()?"rtl":"ltr");
     panel.innerHTML='<div id="nb-head"><div class="nb-t"><span class="nb-title"></span><button class="nb-x" type="button" aria-label="close">×</button></div><button id="nb-new" type="button"></button></div><div id="nb-list"></div>';
