@@ -3,7 +3,7 @@
 <head>
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8">
-<meta name="norm-build" content="2026.07.12.3">
+<meta name="norm-build" content="2026.07.12.4">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -216,6 +216,59 @@
   html.ar .sub{font-size:clamp(15px,1.7vw,17.5px);}
   html.ar .p-desc{font-size:15px;max-width:38ch;}
   html.ar .eyebrow::before{width:22px;}
+
+  /* ============ PHONE EXPERIENCE ============ */
+  @media(max-width:700px){
+    html{-webkit-text-size-adjust:100%;}
+    body{min-height:100dvh;overflow-x:hidden;touch-action:manipulation;}
+    button,a,input,select{-webkit-tap-highlight-color:transparent;}
+    .wrap{min-height:100dvh;padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));}
+    .top{gap:10px;align-items:flex-start;}
+    .brandlogo{height:25px;max-width:128px;}
+    .mark{width:28px;height:28px;}
+    .wordmark{font-size:16px;}
+    .seg button{min-width:44px;min-height:38px;padding:7px 10px;}
+
+    #view-home{justify-content:flex-start;}
+    .hero{margin:clamp(54px,9vh,82px) 0 25px;}
+    .eyebrow{font-size:10.5px;letter-spacing:.15em;}
+    h1{font-size:36px;line-height:1.08;margin-top:14px;}
+    html.ar h1{font-size:34px;line-height:1.28;}
+    .sub,html.ar .sub{font-size:15px;line-height:1.7;margin-top:13px;}
+    .portals{grid-template-columns:1fr;gap:12px;}
+    .portal{min-height:215px;padding:20px;border-radius:15px;transform:none!important;}
+    .portal::after{display:none;}
+    .p-top{margin-bottom:28px;}
+    .p-ico{width:48px;height:48px;}
+    .p-body{margin-top:0;}
+    .p-title{font-size:22px;}
+    .p-desc,html.ar .p-desc{font-size:14px;line-height:1.7;}
+    .p-cta{margin-top:17px;min-height:42px;align-items:center;}
+    .center{padding:50px 0;}
+    .center h1{font-size:34px;}
+    footer{margin-top:24px;align-items:flex-start;flex-direction:column;padding-top:14px;}
+
+    /* Authentication becomes a native-feeling bottom sheet on phones. */
+    #norm-gate{align-items:flex-end!important;padding:0!important;}
+    #norm-gate .ng-card{max-width:none!important;max-height:94dvh!important;overflow:auto!important;border-radius:22px 22px 0 0!important;padding:26px 18px calc(22px + env(safe-area-inset-bottom))!important;}
+    #norm-gate input,#norm-gate .ng-sel{font-size:16px!important;min-height:48px!important;}
+    #norm-gate .ng-btn{min-height:48px!important;}
+    .topright{gap:7px!important;min-width:0;}
+    .authchip{max-width:58vw!important;padding-inline-start:9px!important;}
+    .authchip .ac-name{max-width:80px!important;}
+    .signin-btn{min-height:38px!important;padding:7px 13px!important;}
+  }
+  @media(max-width:370px){
+    h1{font-size:32px;}
+    html.ar h1{font-size:30px;}
+    .portal{padding:17px;}
+    .status{padding:5px 8px;}
+    .authchip .ac-name{display:none;}
+  }
+  @media(hover:none) and (pointer:coarse){
+    .portal:hover{transform:none!important;border-color:var(--line);box-shadow:0 1px 2px rgba(23,24,28,.04),0 22px 48px -30px rgba(23,24,28,.34);}
+    .portal:hover .p-ico,.portal:hover .p-cta .arw{transform:none!important;}
+  }
 </style>
 </head>
 <body>
@@ -316,7 +369,7 @@
        var BRIEF_URL = "https://tools.norm-prod.com/brief/";
      ============================================================ */
   // Build query prevents the browser/CDN from silently reopening an older tool.
-  var BRIEF_URL = "Norm-Brief-Tool.html?v=2026.07.12.3";
+  var BRIEF_URL = "Norm-Brief-Tool.html?v=2026.07.12.4";
 
   var VIEWS = ["home","soon","error"];
   function showView(v){
