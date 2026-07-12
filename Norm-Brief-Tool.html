@@ -4,7 +4,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="norm-build" content="2026.07.12.2" />
+<meta name="norm-build" content="2026.07.12.3" />
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script>window.NORM_BUILD="2026.07.12.2";</script>
+<script>window.NORM_BUILD="2026.07.12.3";</script>
 <style>
   :root{--bg:#ECECE8;--surface:#FCFCFA;--surface-2:#F6F6F2;--ink:#17181C;--muted:#74756F;--line:#DEDDD6;--line-strong:#CFCEC5;--accent:#d72120;--accent-soft:rgba(215,33,32,.07);--accent-soft-2:rgba(215,33,32,.13);--mot:#2563EB;--mot-soft:rgba(37,99,235,.10);--lit:#2563EB;--lit-soft:rgba(37,99,235,.10);--gold:#E0A93B;--prem:#12996A;--prem-soft:#E9F6EE;--prem-line:#B7E0C7;--prem-deep:#0E7A4F;--radius:14px;--radius-sm:10px;--display:"Space Grotesk",system-ui,sans-serif;--body:"Inter",system-ui,sans-serif;--mono:"Space Mono",ui-monospace,monospace;--shadow:0 1px 2px rgba(23,24,28,.04),0 8px 24px -16px rgba(23,24,28,.18);}
   html.ar{--display:"Tajawal",system-ui,sans-serif;--body:"Tajawal",system-ui,sans-serif;--mono:"Tajawal",system-ui,sans-serif;}
@@ -1637,7 +1637,7 @@ function recoverBuiltDeck(){
 function finishDeckResult(d){
   if(!_deckToken)return; resetDeckSending();
   if(d.ok&&/^https:\/\/docs\.google\.com\/presentation\/d\//.test(d.url||"")){
-    const note=(typeof LANG!=="undefined"&&LANG==="ar")?"اكتمل إنشاء العرض. اختر فتح العرض أو العودة للتعديل أو بدء بريف جديد.":"Your deck is complete. Open it, go back to edit, or start a new brief.";
+    const note=d.message||((typeof LANG!=="undefined"&&LANG==="ar")?"اكتمل إنشاء العرض. اختر فتح العرض أو العودة للتعديل أو بدء بريف جديد.":"Your deck is complete. Open it, go back to edit, or start a new brief.");
     showDeckOverlay("success",note,d.url); try{if(window.NORM_refreshBriefs)window.NORM_refreshBriefs();}catch(e){}
   }else showDeckOverlay("error",d.message||"");
 }
@@ -1648,7 +1648,7 @@ function startDeckStatusPoll(){
     try{
       const d=await aiFetch({deckstatus:token}); if(token!==_deckToken)return;
       if(d&&d.found){
-        if(d.state==="done"&&d.url){ finishDeckResult({ok:true,url:d.url}); return; }
+        if(d.state==="done"&&d.url){ finishDeckResult({ok:true,url:d.url,message:d.message||""}); return; }
         if(d.state==="error"){ finishDeckResult({ok:false,message:d.message||""}); return; }
         applyDeckLiveStatus(d);
       }
